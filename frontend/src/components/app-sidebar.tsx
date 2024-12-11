@@ -1,4 +1,5 @@
-import { ArrowLeftRight, Eye, HomeIcon, ImagePlus } from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
+import { ArrowLeftRight, Eye, HomeIcon, ImagePlus, Plus } from "lucide-react";
 
 import {
   Sidebar,
@@ -11,32 +12,34 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import logo from "../../public/logo.png";
+import { cn } from "@/lib/utils";
 
 // Menu items.
 const items = [
   {
     title: "Start",
-    url: "#",
+    url: "/",
     icon: HomeIcon,
   },
   {
     title: "Add Images",
-    url: "#",
+    url: "/add-images",
     icon: ImagePlus,
   },
   {
     title: "Apply Transitions",
-    url: "#",
+    url: "/apply-transitions",
     icon: ArrowLeftRight,
   },
   {
     title: "Preview Video",
-    url: "#",
+    url: "/preview-video",
     icon: Eye,
   },
 ];
 
 export function AppSidebar() {
+  const location = useLocation();
   return (
     <Sidebar side="left" variant="sidebar" collapsible="icon">
       <SidebarContent>
@@ -46,13 +49,30 @@ export function AppSidebar() {
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  asChild
+                  className="bg-primary-500 text-white hover:bg-primary-500/90 hover:text-white active:bg-primary-500 active:text-white"
+                >
+                  <Link to={"/"}>
+                    <Plus />
+                    <span>Create New</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <div>
+                  <SidebarMenuButton
+                    asChild
+                    className={cn(
+                      location.pathname === item.url &&
+                        "bg-sidebar-accent text-sidebar-accent-foreground"
+                    )}
+                  >
+                    <Link to={item.url}>
                       <item.icon />
                       <span>{item.title}</span>
-                    </div>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
