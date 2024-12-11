@@ -52,7 +52,7 @@ export function AppSidebar() {
               <SidebarMenuItem>
                 <SidebarMenuButton
                   asChild
-                  className="bg-primary-500 text-white hover:bg-primary-500/90 hover:text-white active:bg-primary-500 active:text-white"
+                  className="btn-primary active:bg-primary-500 active:text-white"
                 >
                   <Link to={"/"}>
                     <Plus />

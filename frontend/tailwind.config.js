@@ -32,6 +32,14 @@ module.exports = {
           ring: "hsl(var(--sidebar-ring))",
         },
       },
+      backgroundImage: {
+        "gradient-1":
+          "linear-gradient(to bottom, #00AAFF 8%, #00AAFF 5%, #00AAFF 0%)",
+        // Second Gradient
+        "gradient-2": "linear-gradient(to bottom, #00ADF8 0%, #0081F9 8%)",
+        // Third Gradient
+        "gradient-3": "linear-gradient(to bottom, #FFFFFF 0%, #FFFFFF 100%)",
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],

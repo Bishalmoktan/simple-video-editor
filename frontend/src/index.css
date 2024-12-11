@@ -33,4 +33,8 @@
   .responsive-flex {
     @apply flex justify-center md:justify-start flex-wrap gap-y-16 gap-x-2 my-2;
   }
+
+  .btn-primary {
+    @apply bg-primary-500 text-white hover:!bg-primary-500/90 hover:!text-white;
+  }
 }
