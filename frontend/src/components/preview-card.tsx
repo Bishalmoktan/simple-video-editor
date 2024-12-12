@@ -1,9 +1,12 @@
+import { useModal } from "@/context/modal-context";
+
 export type PreviewCardProps = {
   type: "image" | "video";
   name: string;
   resolution?: string;
   duration?: string;
-  imageUrl: string;
+  imageUrl?: string;
+  videoUrl?: string;
 };
 export default function PreviewCard({
   type,
@@ -11,9 +14,18 @@ export default function PreviewCard({
   resolution,
   duration,
   imageUrl,
+  videoUrl,
 }: PreviewCardProps) {
+  const { openModal } = useModal();
+  const data = {
+    title: name,
+    videoSrc: videoUrl!,
+  };
   return (
-    <div className="w-[220px]">
+    <div
+      onClick={() => openModal("previewVideo", data)}
+      className="w-[220px] cursor-pointer"
+    >
       <div className="p-4 bg-primary-100 rounded-lg relative">
         <img src={imageUrl} alt={name} className="rounded-lg" />
         {duration && (

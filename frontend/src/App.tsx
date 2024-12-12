@@ -9,21 +9,26 @@ import PreviewVideo from "@/pages/preview-video";
 import FirstImage from "@/pages/first-image";
 import LastImage from "@/pages/last-image";
 
-import { SidebarTrigger } from "./components/ui/sidebar.tsx";
-import { AppSidebar } from "./components/app-sidebar.tsx";
+import { SidebarTrigger } from "@/components/ui/sidebar.tsx";
+import { AppSidebar } from "@/components/app-sidebar.tsx";
+import { ModalContextProvider } from "@/context/modal-context.tsx";
+import ModalProvider from "@/components/providers/modal-providers";
 
 // Shared Layout Component
 const Layout: React.FC = () => {
   return (
     <>
-      <AppSidebar />
-      <main className="w-screen">
-        <SidebarTrigger />
-        <div className="relative">
-          <div className="bg-gradient-to-b from-[rgba(0,170,255,0.3)] to-[rgba(255,255,255,0.5)] absolute top-0 w-full h-48 -z-10"></div>
-          <Outlet />
-        </div>
-      </main>
+      <ModalContextProvider>
+        <AppSidebar />
+        <main className="w-screen">
+          <SidebarTrigger />
+          <div className="relative">
+            <div className="bg-gradient-to-b from-[rgba(0,170,255,0.3)] to-[rgba(255,255,255,0.5)] absolute top-0 w-full h-48 -z-10"></div>
+            <Outlet />
+            <ModalProvider />
+          </div>
+        </main>
+      </ModalContextProvider>
     </>
   );
 };
