@@ -1,0 +1,1 @@
+{"root":["./src/app.ts","./src/server.ts","./src/configs/cloudinary.config.ts","./src/controllers/upload.controller.ts","./src/middlewares/error.middleware.ts","./src/routes/upload.routes.ts","./src/routes/video.routes.ts","./src/utils/apperror.ts"],"version":"5.7.2"}

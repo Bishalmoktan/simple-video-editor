@@ -1,8 +1,14 @@
 import { Router } from "express";
-import { upload, uploadVideo } from "../controllers/upload.controller";
+import {
+  videoUpload,
+  uploadVideo,
+  imageUpload,
+  uploadImage,
+} from "../controllers/upload.controller";
 
 const router = Router();
 
-router.post("/upload", upload.single("video"), uploadVideo);
+router.post("/upload", videoUpload.single("video"), uploadVideo);
+router.post("/upload-image", imageUpload.single("image"), uploadImage);
 
 export default router;
