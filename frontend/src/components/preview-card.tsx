@@ -1,7 +1,8 @@
 import { useModal } from "@/context/modal-context";
+import { useNavigate } from "react-router-dom";
 
 export type PreviewCardProps = {
-  type: "image" | "video";
+  type: "first-image" | "last-image" | "video";
   name: string;
   resolution?: string;
   duration?: string;
@@ -17,15 +18,21 @@ export default function PreviewCard({
   videoUrl,
 }: PreviewCardProps) {
   const { openModal } = useModal();
+  const navigate = useNavigate();
   const data = {
     title: name,
     videoSrc: videoUrl!,
   };
+
+  const handleClick = () => {
+    if (type === "video") {
+      openModal("previewVideo", data);
+    } else {
+      navigate(`/${type}`);
+    }
+  };
   return (
-    <div
-      onClick={() => openModal("previewVideo", data)}
-      className="w-[220px] cursor-pointer"
-    >
+    <div onClick={handleClick} className="w-[220px] cursor-pointer">
       <div className="p-4 bg-primary-100 rounded-lg relative">
         <img src={imageUrl} alt={name} className="rounded-lg" />
         {duration && (

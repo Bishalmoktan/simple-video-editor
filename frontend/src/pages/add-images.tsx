@@ -12,14 +12,14 @@ import template4 from "@/assets/template4.png";
 import template5 from "@/assets/template5.png";
 import template6 from "@/assets/template6.png";
 
-const videos: PreviewCardProps[] = [
+export const images: PreviewCardProps[] = [
   {
-    type: "image",
+    type: "first-image",
     name: "First Image",
     imageUrl: temp,
   },
   {
-    type: "image",
+    type: "last-image",
     name: "Last Image",
     imageUrl: temp,
   },
@@ -39,12 +39,14 @@ const AddImages = () => {
           icon={AddImageIcon}
           title="Add First Image"
           className="bg-gradient-to-r from-[#00C6DD] via-[#13D8EC] to-[#BEF3FF]"
+          type="image"
         />
 
         <AddImageVideo
           icon={AddImageIcon}
           title="Add Last Image"
           className="bg-gradient-to-r from-[#78E4EF]  via-[#F0ECFD] to-[#FDA8FF]"
+          type="image"
         />
       </div>
 
@@ -52,9 +54,10 @@ const AddImages = () => {
       <div>
         <h2 className="h2">Add First and Last Image of your Video</h2>
         <div className="flex justify-center md:justify-start flex-wrap gap-y-8 gap-x-2 my-2">
-          {videos.map((video, index) => (
-            <PreviewCard key={index} {...video} />
+          {images.map((image, index) => (
+            <PreviewCard key={index} {...image} />
           ))}
+          {images.length === 0 && <div>No images added.</div>}
         </div>
       </div>
 

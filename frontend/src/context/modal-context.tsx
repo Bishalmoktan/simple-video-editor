@@ -1,10 +1,12 @@
 import React, { createContext, useContext, useState } from "react";
 
-type ModalType = "previewVideo";
+type ModalType = "previewVideo" | "uploadFile";
 
 type ModalDataType = {
   title: string;
-  videoSrc: string;
+  videoSrc?: string;
+  progress?: number;
+  isUploading?: boolean;
 };
 
 export type ModalContextType = {
@@ -36,6 +38,8 @@ export const ModalContextProvider = ({
 
   const closeModal = () => {
     setIsOpen(false);
+    setData(null);
+    setType(null);
   };
 
   return (

@@ -10,9 +10,11 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import logo from "../../public/logo.png";
 import { cn } from "@/lib/utils";
+import { images } from "@/pages/add-images";
 
 // Menu items.
 const items = [
@@ -25,6 +27,7 @@ const items = [
     title: "Add Images",
     url: "/add-images",
     icon: ImagePlus,
+    images: images,
   },
   {
     title: "Apply Transitions",
@@ -40,6 +43,7 @@ const items = [
 
 export function AppSidebar() {
   const location = useLocation();
+  const { isMobile, state } = useSidebar();
   return (
     <Sidebar side="left" variant="sidebar" collapsible="icon">
       <SidebarContent>
@@ -60,6 +64,7 @@ export function AppSidebar() {
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
+
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
@@ -74,6 +79,22 @@ export function AppSidebar() {
                       <span>{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
+                  <div
+                    className={`pl-12 flex flex-col gap-2 ${item.images && images.length > 0 && "my-2"} ${
+                      (state === "collapsed" || isMobile) && "hidden"
+                    }`}
+                  >
+                    {item.images &&
+                      item.images.map((image, index) => (
+                        <Link
+                          className="bg-primary-500 text-white rounded-sm p-2"
+                          to={`/${image.type}`}
+                          key={index}
+                        >
+                          {image.name}
+                        </Link>
+                      ))}
+                  </div>
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>

@@ -13,6 +13,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar.tsx";
 import { AppSidebar } from "@/components/app-sidebar.tsx";
 import { ModalContextProvider } from "@/context/modal-context.tsx";
 import ModalProvider from "@/components/providers/modal-providers";
+import { Toaster } from "@/components/ui/toaster";
 
 // Shared Layout Component
 const Layout: React.FC = () => {
@@ -27,6 +28,7 @@ const Layout: React.FC = () => {
             <Outlet />
             <ModalProvider />
           </div>
+          <Toaster />
         </main>
       </ModalContextProvider>
     </>

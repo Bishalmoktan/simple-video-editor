@@ -49,7 +49,8 @@ const Home = () => {
         <AddImageVideo
           icon={AddVideoIcon}
           title="Add Video"
-          className="  bg-gradient-to-r from-[#00C6DD] via-[#13D8EC] to-[#BEF3FF]"
+          className="bg-gradient-to-r from-[#00C6DD] via-[#13D8EC] to-[#BEF3FF]"
+          type="video"
         />
       </div>
 
@@ -60,6 +61,7 @@ const Home = () => {
           {videos.map((video, index) => (
             <PreviewCard key={index} {...video} />
           ))}
+          {videos.length === 0 && <div>No videos added.</div>}
         </div>
       </div>
 
