@@ -1,10 +1,13 @@
 import EditImage from "@/components/edit-image";
-import temp from "../../public/temp.png";
+import { useAppContext } from "@/context/app-context";
 
 const LastImage = () => {
+  const { lastImage } = useAppContext();
   return (
     <div>
-      <EditImage imageUrl={temp} type="lastImage" />
+      {lastImage && (
+        <EditImage imageUrl={lastImage.imageUrl!} type="lastImage" />
+      )}
     </div>
   );
 };

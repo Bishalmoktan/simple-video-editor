@@ -5,12 +5,13 @@ import { useToast } from "@/hooks/use-toast";
 import { uploadImage, uploadVideo } from "@/services/api-service";
 import { AxiosError, AxiosProgressEvent } from "axios";
 import { useModal } from "@/context/modal-context";
+import { useAppContext } from "@/context/app-context";
 
 type Props = {
   title: string;
   icon: React.FC<React.SVGProps<SVGSVGElement>>;
   className?: string;
-  type: "image" | "video";
+  type: "first-image" | "last-image" | "video";
 };
 
 export default function AddImageVideo({
@@ -19,6 +20,7 @@ export default function AddImageVideo({
   title,
   type,
 }: Props) {
+  const { setFirstImage, setLastImage, setVideos } = useAppContext();
   const { openModal, closeModal } = useModal();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const { toast } = useToast();
@@ -31,7 +33,7 @@ export default function AddImageVideo({
     }
 
     openModal("uploadFile", {
-      title: `${type === "image" ? "Image" : "Video"} Uploading`,
+      title: `${type === "video" ? "Video" : "Image"} Uploading`,
       isUploading: true,
       progress: 0,
     });
@@ -59,7 +61,20 @@ export default function AddImageVideo({
             progress: 100,
           });
           setTimeout(() => closeModal(), 1500);
-          console.log(response);
+          const video = document.createElement("video");
+          video.src = response.videoUrl;
+
+          video.onloadedmetadata = () => {
+            setVideos((prev) => [
+              ...prev,
+              {
+                name: file.name,
+                type: "video",
+                duration: video?.duration,
+                resolution: `${video.videoWidth}x${video.videoHeight}`,
+              },
+            ]);
+          };
         }
       } catch (err) {
         if (err instanceof AxiosError) {
@@ -104,7 +119,19 @@ export default function AddImageVideo({
             progress: 100,
           });
           setTimeout(() => closeModal(), 1500);
-          console.log(response);
+          if (type === "first-image") {
+            setFirstImage({
+              name: "First Image",
+              type,
+              imageUrl: response.imageUrl,
+            });
+          } else {
+            setLastImage({
+              name: "Last Image",
+              type,
+              imageUrl: response.imageUrl,
+            });
+          }
         }
       } catch (err) {
         if (err instanceof AxiosError) {
@@ -132,7 +159,7 @@ export default function AddImageVideo({
   return (
     <div>
       <Label
-        htmlFor="logo"
+        htmlFor={type}
         className={`flex flex-col rounded-lg cursor-pointer  w-[220px] h-[125px] justify-center items-center space-x-2 ${className} shadow-[0_0_7.77px_rgba(220,240,255,0.25)]`}
       >
         <Icon className="size-10" />
@@ -143,8 +170,8 @@ export default function AddImageVideo({
         onChange={handleFileChange}
         className="hidden"
         type="file"
-        id="logo"
-        accept={`${type}/*`}
+        id={type}
+        accept={`${type === "video" ? type : "image"}/*`}
       />
     </div>
   );

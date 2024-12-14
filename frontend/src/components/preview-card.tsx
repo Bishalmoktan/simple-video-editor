@@ -5,7 +5,7 @@ export type PreviewCardProps = {
   type: "first-image" | "last-image" | "video";
   name: string;
   resolution?: string;
-  duration?: string;
+  duration?: number;
   imageUrl?: string;
   videoUrl?: string;
 };

@@ -14,10 +14,19 @@ import {
 } from "@/components/ui/sidebar";
 import logo from "../../public/logo.png";
 import { cn } from "@/lib/utils";
-import { images } from "@/pages/add-images";
+import { useAppContext } from "@/context/app-context";
+import { PreviewCardProps } from "./preview-card";
 
 // Menu items.
-const items = [
+type ItemType = {
+  title: string;
+  url: string;
+  icon: React.FC<React.SVGProps<SVGSVGElement>>;
+  firstImage?: PreviewCardProps | null;
+  lastImage?: PreviewCardProps | null;
+};
+
+const items: ItemType[] = [
   {
     title: "Start",
     url: "/",
@@ -27,7 +36,6 @@ const items = [
     title: "Add Images",
     url: "/add-images",
     icon: ImagePlus,
-    images: images,
   },
   {
     title: "Apply Transitions",
@@ -44,6 +52,10 @@ const items = [
 export function AppSidebar() {
   const location = useLocation();
   const { isMobile, state } = useSidebar();
+  const { firstImage, lastImage } = useAppContext();
+  items[1].firstImage = firstImage;
+  items[1].lastImage = lastImage;
+
   return (
     <Sidebar side="left" variant="sidebar" collapsible="icon">
       <SidebarContent>
@@ -65,7 +77,7 @@ export function AppSidebar() {
                 </SidebarMenuButton>
               </SidebarMenuItem>
 
-              {items.map((item) => (
+              {items.map((item, index) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
                     asChild
@@ -79,22 +91,30 @@ export function AppSidebar() {
                       <span>{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
-                  <div
-                    className={`pl-12 flex flex-col gap-2 ${item.images && images.length > 0 && "my-2"} ${
-                      (state === "collapsed" || isMobile) && "hidden"
-                    }`}
-                  >
-                    {item.images &&
-                      item.images.map((image, index) => (
+                  {index === 1 && (
+                    <div
+                      className={`pl-12 flex flex-col gap-2 ${item.firstImage && "my-2"} ${
+                        (state === "collapsed" || isMobile) && "hidden"
+                      }`}
+                    >
+                      {firstImage && (
                         <Link
                           className="bg-primary-500 text-white rounded-sm p-2"
-                          to={`/${image.type}`}
-                          key={index}
+                          to={`/${firstImage.type}`}
                         >
-                          {image.name}
+                          {firstImage.name}
                         </Link>
-                      ))}
-                  </div>
+                      )}
+                      {lastImage && (
+                        <Link
+                          className="bg-primary-500 text-white rounded-sm p-2"
+                          to={`/${lastImage.type}`}
+                        >
+                          {lastImage.name}
+                        </Link>
+                      )}
+                    </div>
+                  )}
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>

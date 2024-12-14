@@ -1,7 +1,6 @@
 import AddImageIcon from "@/assets/icons/add-image";
 import AddImageVideo from "@/components/add-image-video";
-import PreviewCard, { PreviewCardProps } from "@/components/preview-card";
-import temp from "../../public/temp.png";
+import PreviewCard from "@/components/preview-card";
 import TemplateSection, {
   TemplateSectionProps,
 } from "@/components/template-section";
@@ -11,19 +10,7 @@ import template3 from "@/assets/template3.png";
 import template4 from "@/assets/template4.png";
 import template5 from "@/assets/template5.png";
 import template6 from "@/assets/template6.png";
-
-export const images: PreviewCardProps[] = [
-  {
-    type: "first-image",
-    name: "First Image",
-    imageUrl: temp,
-  },
-  {
-    type: "last-image",
-    name: "Last Image",
-    imageUrl: temp,
-  },
-];
+import { useAppContext } from "@/context/app-context";
 
 const templates: TemplateSectionProps = {
   title: "Image Templates",
@@ -31,6 +18,7 @@ const templates: TemplateSectionProps = {
 };
 
 const AddImages = () => {
+  const { firstImage, lastImage } = useAppContext();
   return (
     <section className="px-8 py-4 space-y-8">
       {/* add first and last image section  */}
@@ -39,14 +27,14 @@ const AddImages = () => {
           icon={AddImageIcon}
           title="Add First Image"
           className="bg-gradient-to-r from-[#00C6DD] via-[#13D8EC] to-[#BEF3FF]"
-          type="image"
+          type="first-image"
         />
 
         <AddImageVideo
           icon={AddImageIcon}
           title="Add Last Image"
           className="bg-gradient-to-r from-[#78E4EF]  via-[#F0ECFD] to-[#FDA8FF]"
-          type="image"
+          type="last-image"
         />
       </div>
 
@@ -54,10 +42,9 @@ const AddImages = () => {
       <div>
         <h2 className="h2">Add First and Last Image of your Video</h2>
         <div className="flex justify-center md:justify-start flex-wrap gap-y-8 gap-x-2 my-2">
-          {images.map((image, index) => (
-            <PreviewCard key={index} {...image} />
-          ))}
-          {images.length === 0 && <div>No images added.</div>}
+          {firstImage && <PreviewCard {...firstImage} />}
+          {lastImage && <PreviewCard {...lastImage} />}
+          {!firstImage && !lastImage && <div>No images added.</div>}
         </div>
       </div>
 

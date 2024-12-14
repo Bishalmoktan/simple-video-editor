@@ -8,6 +8,13 @@ export const axiosClientFormData = axios.create({
   },
 });
 
+export const axiosClient = axios.create({
+  baseURL: env.API_BASE_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
 export const uploadVideo = async (
   file: File,
   onUploadProgress: (event: AxiosProgressEvent) => void

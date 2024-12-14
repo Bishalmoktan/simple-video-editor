@@ -1,7 +1,6 @@
 import AddVideoIcon from "@/assets/icons/add-video";
 import AddImageVideo from "@/components/add-image-video";
-import PreviewCard, { PreviewCardProps } from "@/components/preview-card";
-import temp from "../../public/temp.png";
+import PreviewCard from "@/components/preview-card";
 import TemplateSection, {
   TemplateSectionProps,
 } from "@/components/template-section";
@@ -11,30 +10,7 @@ import template3 from "@/assets/template3.png";
 import template4 from "@/assets/template4.png";
 import template5 from "@/assets/template5.png";
 import template6 from "@/assets/template6.png";
-
-const videos: PreviewCardProps[] = [
-  {
-    type: "video",
-    name: "Preview 1",
-    resolution: "850x1280",
-    duration: "00:07",
-    imageUrl: temp,
-  },
-  {
-    type: "video",
-    name: "Preview 2",
-    resolution: "850x1280",
-    duration: "00:07",
-    imageUrl: temp,
-  },
-  {
-    type: "video",
-    name: "Preview 3",
-    resolution: "850x1280",
-    duration: "00:07",
-    imageUrl: temp,
-  },
-];
+import { useAppContext } from "@/context/app-context";
 
 const templates: TemplateSectionProps = {
   title: "Video Templates",
@@ -42,6 +18,7 @@ const templates: TemplateSectionProps = {
 };
 
 const Home = () => {
+  const { videos } = useAppContext();
   return (
     <section className="px-8 py-4 space-y-8">
       {/* add video section  */}
