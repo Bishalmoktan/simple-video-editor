@@ -222,11 +222,11 @@ export default function EditImage({ type, imageUrl }: Props) {
               {/* Title Element */}
               <Rnd
                 position={{ x: titlePosition.x, y: titlePosition.y }}
-                onDragStop={(e, d) => {
+                onDragStop={(_e, d) => {
                   setEnablePreview(false);
                   setTitlePosition((prev) => ({ ...prev, x: d.x, y: d.y }));
                 }}
-                onResizeStop={(e, direction, ref, delta, position) => {
+                onResizeStop={(_e, _direction, ref, _delta, position) => {
                   setEnablePreview(false);
                   setTitlePosition({
                     width: parseInt(ref.style.width),
@@ -258,11 +258,11 @@ export default function EditImage({ type, imageUrl }: Props) {
               {/* Subtitle Element */}
               <Rnd
                 position={{ x: subtitlePosition.x, y: subtitlePosition.y }}
-                onDragStop={(e, d) => {
+                onDragStop={(_e, d) => {
                   setEnablePreview(false);
                   setSubtitlePosition((prev) => ({ ...prev, x: d.x, y: d.y }));
                 }}
-                onResizeStop={(e, direction, ref, delta, position) => {
+                onResizeStop={(_e, _direction, ref, _delta, position) => {
                   setEnablePreview(false);
                   setSubtitlePosition({
                     width: parseInt(ref.style.width),
@@ -295,11 +295,11 @@ export default function EditImage({ type, imageUrl }: Props) {
               {logo && (
                 <Rnd
                   position={{ x: logoPosition.x, y: logoPosition.y }}
-                  onDragStop={(e, d) => {
+                  onDragStop={(_e, d) => {
                     setEnablePreview(false);
                     setLogoPosition((prev) => ({ ...prev, x: d.x, y: d.y }));
                   }}
-                  onResizeStop={(e, direction, ref, delta, position) => {
+                  onResizeStop={(_e, _direction, ref, _delta, position) => {
                     setEnablePreview(false);
                     setLogoPosition({
                       width: parseInt(ref.style.width),
