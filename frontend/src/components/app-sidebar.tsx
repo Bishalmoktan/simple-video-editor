@@ -61,7 +61,9 @@ export function AppSidebar() {
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel className="my-8">
-            <img src={logo} alt="Logo" />
+            <Link to={"/"}>
+              <img src={logo} alt="Logo" />
+            </Link>
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>

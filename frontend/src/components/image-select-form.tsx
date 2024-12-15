@@ -12,14 +12,17 @@ type Props = {
   label: string;
   placeholder: string;
   options: string[];
+  onChange: ((value: string) => void) | undefined;
 };
+
 export default function ImageSelectForm({
   label,
   placeholder,
   options,
+  onChange,
 }: Props) {
   return (
-    <Select>
+    <Select onValueChange={onChange}>
       <SelectTrigger className="w-full">
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
