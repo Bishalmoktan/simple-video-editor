@@ -72,6 +72,7 @@ export default function AddImageVideo({
                 type: "video",
                 duration: video?.duration,
                 resolution: `${video.videoWidth}x${video.videoHeight}`,
+                videoUrl: video.src,
               },
             ]);
           };

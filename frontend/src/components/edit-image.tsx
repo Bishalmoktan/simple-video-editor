@@ -10,6 +10,7 @@ import { env } from "@/config/env";
 import { useModal } from "@/context/modal-context";
 import { useToast } from "@/hooks/use-toast";
 import { AxiosError } from "axios";
+import { useAppContext } from "@/context/app-context";
 
 type Props = {
   type: "lastImage" | "firstImage";
@@ -36,6 +37,8 @@ export default function EditImage({ type, imageUrl }: Props) {
   const [fontFamily, setFontFamily] = useState("Arial");
   const [textColor, setTextColor] = useState("#000000");
   const [transition, setTransition] = useState("fade");
+
+  const { setFirstImageVideo, setLastImageVideo } = useAppContext();
 
   const fontFamilyOptions = [
     "Arial",
@@ -162,6 +165,11 @@ export default function EditImage({ type, imageUrl }: Props) {
       );
 
       setVideoUrl(res.data.videoUrl);
+      if (type === "firstImage") {
+        setFirstImageVideo(`${env.API_BASE_URL}${res.data.videoUrl}`);
+      } else {
+        setLastImageVideo(`${env.API_BASE_URL}${res.data.videoUrl}`);
+      }
       setEnablePreview(true);
       toast({
         title: "Video generated!",

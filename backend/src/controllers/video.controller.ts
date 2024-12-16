@@ -1,13 +1,20 @@
 import { Request, Response, NextFunction } from "express";
 import ffmpeg from "fluent-ffmpeg";
-import ffmpegPath from "ffmpeg-static";
+
 import path from "path";
 import fs from "fs";
 import multer from "multer";
 import axios from "axios";
+import ffmpegPath from "ffmpeg-static";
 
-// Set ffmpeg path
-if (ffmpegPath) ffmpeg.setFfmpegPath(ffmpegPath);
+// const ffmpegPath = require("@ffmpeg-installer/ffmpeg").path;
+// const ffprobePath = require("@ffprobe-installer/ffprobe").path;
+
+if (ffmpegPath) {
+  ffmpeg.setFfmpegPath(ffmpegPath);
+}
+const ffprobePath = require("@ffprobe-installer/ffprobe").path;
+ffmpeg.setFfprobePath(ffprobePath);
 
 // Set up multer storage for temporary file uploads
 const storage = multer.diskStorage({
@@ -33,11 +40,11 @@ const hexToFFmpegColor = (hex: string) => {
   return color.length > 6 ? color.substring(0, 6) : color;
 };
 
-const downloadImage = async (url: string) => {
+const downloadFile = async (url: string, type: "video" | "image") => {
   const downloadPath = path.join(
     __dirname,
     "../downloads",
-    `image-${Date.now()}.jpg`
+    `${type}-${Date.now()}.mp4`
   );
 
   // Ensure downloads directory exists
@@ -229,7 +236,7 @@ export const createVideoFromImage = async (
 
       // Create the video using FFmpeg
       const imagePath = image.startsWith("http")
-        ? await downloadImage(image)
+        ? await downloadFile(image, "image")
         : image;
       const ffmpegCommand = ffmpeg()
         .input(imagePath)
@@ -264,4 +271,226 @@ export const createVideoFromImage = async (
       next(error);
     }
   });
+};
+
+function getMediaInfo(filePath: string) {
+  return new Promise((resolve, reject) => {
+    ffmpeg.ffprobe(filePath, (err, metadata) => {
+      if (err) {
+        reject(err);
+      } else {
+        const hasAudio = metadata.streams.some(
+          (stream) => stream.codec_type === "audio"
+        );
+        const duration = metadata.format.duration;
+        resolve({ hasAudio, duration });
+      }
+    });
+  });
+}
+
+export const mergeVideos = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { videoUrls, transitions } = req.body;
+  console.log(videoUrls);
+  if (!videoUrls || videoUrls.length === 1) {
+    res.status(400).json({ message: "Provide at least two videos" });
+    return;
+  }
+
+  try {
+    const mediaFiles = [];
+    const mediaInfos = [];
+
+    // Download video files
+    if (videoUrls && videoUrls.length > 0) {
+      const videoFiles = await Promise.all(
+        videoUrls.map((url: string, index: number) => {
+          return downloadFile(url, "video");
+        })
+      );
+      mediaFiles.push(...videoFiles);
+    }
+
+    if (mediaFiles.length === 0) {
+      res.status(400).json({ message: "No media files to process" });
+      return;
+    }
+
+    // Get media info for each file
+    for (let i = 0; i < mediaFiles.length; i++) {
+      const mediaInfo = await getMediaInfo(mediaFiles[i]);
+      mediaInfos.push({
+        file: mediaFiles[i],
+        //@ts-expect-error
+        hasAudio: mediaInfo.hasAudio,
+        //@ts-expect-error
+        duration: mediaInfo.duration,
+      });
+    }
+
+    const tempDir = path.join(__dirname, "../output");
+    if (!fs.existsSync(tempDir)) {
+      fs.mkdirSync(tempDir, { recursive: true });
+    }
+
+    const outputVideoPath = path.join(tempDir, "output.mp4");
+
+    // Validate transitions array
+    const expectedTransitions = mediaFiles.length - 1;
+    let transitionsArray = [];
+
+    if (transitions && Array.isArray(transitions)) {
+      if (transitions.length !== expectedTransitions) {
+        res.status(400).json({
+          message: `Number of transitions (${transitions.length}) does not match the required number (${expectedTransitions})`,
+        });
+        return;
+      }
+      transitionsArray = transitions;
+    } else {
+      // Default to 'none' if not provided
+      transitionsArray = Array(expectedTransitions).fill("none");
+    }
+
+    // Validate transitions
+    const supportedTransitions = [
+      "fade",
+      "wipeleft",
+      "wiperight",
+      "slideup",
+      "slidedown",
+      "circleopen",
+      "circleclose",
+      // Add other supported transitions
+    ];
+
+    if (!transitionsArray.every((t) => supportedTransitions.includes(t))) {
+      res
+        .status(400)
+        .json({ message: "One or more unsupported transitions provided." });
+      return;
+    }
+
+    // Build the FFmpeg command
+    let ffmpegCommand = ffmpeg();
+
+    // Add all input media files
+    mediaFiles.forEach((file) => {
+      ffmpegCommand = ffmpegCommand.addInput(file);
+    });
+
+    // Prepare the filter_complex string with transitions
+    let filterComplex = "";
+    const transitionDuration = 1; // Duration of the transition in seconds
+
+    // Prepare video scaling, setting framerate, and labeling
+    for (let i = 0; i < mediaFiles.length; i++) {
+      filterComplex += `[${i}:v]scale=1280:720,setsar=1,fps=25,format=yuv420p,settb=AVTB[v${i}];`;
+    }
+
+    // Prepare audio streams (generate silent audio if needed)
+    for (let i = 0; i < mediaFiles.length; i++) {
+      if (!mediaInfos[i].hasAudio) {
+        filterComplex += `aevalsrc=0:d=${mediaInfos[i].duration}[a${i}];`;
+      }
+    }
+
+    // Initialize the video merging process
+    let lastVideo = `[v0]`;
+    let totalDuration = 0;
+
+    for (let i = 1; i < mediaFiles.length; i++) {
+      const currentVideo = `[v${i}]`;
+      const transition = transitionsArray[i - 1] || "none";
+      const outputVideo = `[v_temp${i}]`;
+
+      // Calculate offset for xfade
+      totalDuration +=
+        parseFloat(mediaInfos[i - 1].duration) - transitionDuration;
+
+      if (transition === "none") {
+        // No transition, simple concatenation
+        filterComplex += `${lastVideo}${currentVideo}concat=n=2:v=1:a=0[${outputVideo.slice(1, -1)}];`;
+      } else {
+        // Apply transition using xfade
+        filterComplex += `${lastVideo}${currentVideo}xfade=transition=${transition}:duration=${transitionDuration}:offset=${totalDuration}[${outputVideo.slice(1, -1)}];`;
+      }
+
+      lastVideo = outputVideo;
+    }
+
+    // Handle audio concatenation
+    let audioInputs = [];
+    for (let i = 0; i < mediaFiles.length; i++) {
+      const audioLabel = mediaInfos[i].hasAudio ? `[${i}:a]` : `[a${i}]`;
+      audioInputs.push(audioLabel);
+    }
+
+    // Concatenate audio streams
+    const audioConcatInputs = audioInputs.join("");
+    filterComplex += `${audioConcatInputs}concat=n=${mediaFiles.length}:v=0:a=1[aout];`;
+
+    // Map the final video and audio outputs
+    const finalVideoLabel =
+      mediaFiles.length > 1 ? `[v_temp${mediaFiles.length - 1}]` : `[v0]`;
+
+    ffmpegCommand
+      .complexFilter(filterComplex)
+      .outputOptions([
+        "-map",
+        finalVideoLabel,
+        "-map",
+        "[aout]",
+        "-preset",
+        "fast",
+        "-c:v",
+        "libx264",
+        "-c:a",
+        "aac",
+        "-pix_fmt",
+        "yuv420p",
+        "-r",
+        "25", // Set output frame rate to 25 fps
+      ])
+      .on("start", (commandLine) => {
+        console.log(`FFmpeg command: ${commandLine}`);
+      })
+      .on("end", () => {
+        console.log("Merging complete. Sending file...");
+        res.sendFile(outputVideoPath, (err) => {
+          if (err) {
+            console.error("Error sending file:", err);
+            res.status(500).json({
+              message: "Error sending merged video",
+              error: err.message,
+            });
+          }
+        });
+
+        res.on("finish", () => {
+          console.log("Response finished. Cleaning up temp files.");
+          try {
+            fs.rmSync(tempDir, { recursive: true, force: true });
+          } catch (err) {
+            console.error("Error cleaning up temp files:", err);
+          }
+        });
+      })
+      .on("error", (err, stdout, stderr) => {
+        console.error("FFmpeg Error:", err.message);
+        console.error("FFmpeg Stdout:", stdout);
+        console.error("FFmpeg Stderr:", stderr);
+        res.status(500).json({
+          message: "Error merging videos",
+          error: stderr || err.message,
+        });
+      })
+      .save(outputVideoPath);
+  } catch (err) {
+    next(err);
+  }
 };
