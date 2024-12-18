@@ -4,21 +4,43 @@ import PreviewCard from "@/components/preview-card";
 import TemplateSection, {
   TemplateSectionProps,
 } from "@/components/template-section";
-import template1 from "@/assets/template1.png";
-import template2 from "@/assets/template2.png";
-import template3 from "@/assets/template3.png";
-import template4 from "@/assets/template4.png";
-import template5 from "@/assets/template5.png";
-import template6 from "@/assets/template6.png";
 import { useAppContext } from "@/context/app-context";
-
-const templates: TemplateSectionProps = {
-  title: "Video Templates",
-  images: [template1, template2, template3, template4, template5, template6],
-};
+import { useEffect, useState } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { AxiosError } from "axios";
+import { axiosClient } from "@/services/api-service";
 
 const Home = () => {
+  const [templates, setTemplates] = useState<TemplateSectionProps | null>(null);
+
   const { videos } = useAppContext();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const getSampleVideos = async () => {
+      try {
+        const res = await axiosClient.get("/api/videos/sample-videos");
+        setTemplates({
+          title: "Video Templates",
+          videos: res.data.videos,
+        });
+      } catch (error) {
+        if (error instanceof AxiosError) {
+          toast({
+            description: error.message,
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            description: "Error getting the sample videos",
+            variant: "destructive",
+          });
+        }
+      }
+    };
+    getSampleVideos();
+  }, []);
+
   return (
     <section className="px-8 py-4 space-y-8">
       {/* add video section  */}
@@ -43,9 +65,11 @@ const Home = () => {
       </div>
 
       {/* template sections */}
-      <div>
-        <TemplateSection {...templates} />
-      </div>
+      {templates && (
+        <div>
+          <TemplateSection {...templates} />
+        </div>
+      )}
     </section>
   );
 };

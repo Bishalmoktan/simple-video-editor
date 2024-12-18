@@ -10,6 +10,8 @@ const transitionOptions = [
   "Wipe Right",
   "Slide Up",
   "Slide Down",
+  "Circle Open",
+  "Circle Close",
 ];
 
 const ApplyTransitions = () => {
@@ -44,13 +46,18 @@ const ApplyTransitions = () => {
   useEffect(() => {
     setTransitionsFinal(transitions);
   }, [transitions]);
+
   return (
     <div className="p-5">
       <h2 className="h2">Apply transition on your videos</h2>
       <div className="space-y-8 my-16">
         {videoUrls.map((url, index) => (
           <div key={index} className="flex gap-10">
-            <video className="w-[300px] rounded-md" src={url} controls />
+            <video
+              className="w-[300px] h-[200px] rounded-md"
+              src={url}
+              controls
+            />
             {videoUrls[index + 1] && (
               <div className="py-8">
                 <Label className="text-sm text-slate-500">
@@ -66,6 +73,9 @@ const ApplyTransitions = () => {
             )}
           </div>
         ))}
+        {videoUrls.length <= 1 && (
+          <div>Please provie at least two videos for applying transitons.</div>
+        )}
       </div>
     </div>
   );

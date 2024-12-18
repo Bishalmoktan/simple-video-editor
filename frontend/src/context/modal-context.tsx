@@ -1,12 +1,20 @@
 import React, { createContext, useContext, useState } from "react";
 
-type ModalType = "previewVideo" | "uploadFile";
+type ModalType =
+  | "previewVideo"
+  | "uploadFile"
+  | "loading"
+  | "videoImport"
+  | "imageImport"
+  | "infoModal";
 
 type ModalDataType = {
   title: string;
   videoSrc?: string;
   progress?: number;
-  isUploading?: boolean;
+  isLoading?: boolean;
+  imageSrc?: string;
+  description?: string;
 };
 
 export type ModalContextType = {

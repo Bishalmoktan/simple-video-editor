@@ -95,7 +95,7 @@ export function AppSidebar() {
                   </SidebarMenuButton>
                   {index === 1 && (
                     <div
-                      className={`pl-12 flex flex-col gap-2 ${item.firstImage && "my-2"} ${
+                      className={`pl-12 flex flex-col ${item.firstImage && "my-2"} ${
                         (state === "collapsed" || isMobile) && "hidden"
                       }`}
                     >
@@ -109,7 +109,7 @@ export function AppSidebar() {
                       )}
                       {lastImage && (
                         <Link
-                          className="bg-primary-500 text-white rounded-sm p-2"
+                          className="bg-primary-500 text-white rounded-sm p-2 mt-2"
                           to={`/${lastImage.type}`}
                         >
                           {lastImage.name}

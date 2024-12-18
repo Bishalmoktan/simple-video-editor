@@ -6,9 +6,7 @@ import fs from "fs";
 import multer from "multer";
 import axios from "axios";
 import ffmpegPath from "ffmpeg-static";
-
-// const ffmpegPath = require("@ffmpeg-installer/ffmpeg").path;
-// const ffprobePath = require("@ffprobe-installer/ffprobe").path;
+import { imagesTemplate, videosTemplate } from "../data/data";
 
 if (ffmpegPath) {
   ffmpeg.setFfmpegPath(ffmpegPath);
@@ -260,6 +258,19 @@ export const createVideoFromImage = async (
             message: "Video created successfully",
             videoUrl,
           });
+
+          const downloadPath = path.join(__dirname, "../downloads");
+
+          res.on("finish", () => {
+            console.log(
+              "Response finished. Cleaning up downloaded temp files."
+            );
+            try {
+              fs.rmSync(downloadPath, { recursive: true, force: true });
+            } catch (err) {
+              console.error("Error cleaning up downloaded temp files:", err);
+            }
+          });
         })
         .on("error", (err, stdout, stderr) => {
           console.error("FFmpeg error:", err);
@@ -294,7 +305,7 @@ export const mergeVideos = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { videoUrls, transitions } = req.body;
+  const { videoUrls, transitions, userType = "free" } = req.body; // Add userType to request body
   console.log(videoUrls);
   if (!videoUrls || videoUrls.length === 1) {
     res.status(400).json({ message: "Provide at least two videos" });
@@ -308,9 +319,7 @@ export const mergeVideos = async (
     // Download video files
     if (videoUrls && videoUrls.length > 0) {
       const videoFiles = await Promise.all(
-        videoUrls.map((url: string, index: number) => {
-          return downloadFile(url, "video");
-        })
+        videoUrls.map((url: string) => downloadFile(url, "video"))
       );
       mediaFiles.push(...videoFiles);
     }
@@ -352,7 +361,6 @@ export const mergeVideos = async (
       }
       transitionsArray = transitions;
     } else {
-      // Default to 'none' if not provided
       transitionsArray = Array(expectedTransitions).fill("none");
     }
 
@@ -365,7 +373,6 @@ export const mergeVideos = async (
       "slidedown",
       "circleopen",
       "circleclose",
-      // Add other supported transitions
     ];
 
     if (!transitionsArray.every((t) => supportedTransitions.includes(t))) {
@@ -385,7 +392,7 @@ export const mergeVideos = async (
 
     // Prepare the filter_complex string with transitions
     let filterComplex = "";
-    const transitionDuration = 1; // Duration of the transition in seconds
+    const transitionDuration = 1;
 
     // Prepare video scaling, setting framerate, and labeling
     for (let i = 0; i < mediaFiles.length; i++) {
@@ -408,15 +415,12 @@ export const mergeVideos = async (
       const transition = transitionsArray[i - 1] || "none";
       const outputVideo = `[v_temp${i}]`;
 
-      // Calculate offset for xfade
       totalDuration +=
         parseFloat(mediaInfos[i - 1].duration) - transitionDuration;
 
       if (transition === "none") {
-        // No transition, simple concatenation
         filterComplex += `${lastVideo}${currentVideo}concat=n=2:v=1:a=0[${outputVideo.slice(1, -1)}];`;
       } else {
-        // Apply transition using xfade
         filterComplex += `${lastVideo}${currentVideo}xfade=transition=${transition}:duration=${transitionDuration}:offset=${totalDuration}[${outputVideo.slice(1, -1)}];`;
       }
 
@@ -434,15 +438,23 @@ export const mergeVideos = async (
     const audioConcatInputs = audioInputs.join("");
     filterComplex += `${audioConcatInputs}concat=n=${mediaFiles.length}:v=0:a=1[aout];`;
 
-    // Map the final video and audio outputs
+    // Get the final video label before watermark
     const finalVideoLabel =
       mediaFiles.length > 1 ? `[v_temp${mediaFiles.length - 1}]` : `[v0]`;
+
+    // Add watermark for free users
+    const finalOutputLabel =
+      userType === "free" ? "[watermarked]" : finalVideoLabel;
+
+    if (userType === "free") {
+      filterComplex += `${finalVideoLabel}drawtext=text='Band Breeze':fontsize=144:fontcolor=white:x=(w-text_w)/2:y=(h-text_h)/2:alpha=0.5${finalOutputLabel};`;
+    }
 
     ffmpegCommand
       .complexFilter(filterComplex)
       .outputOptions([
         "-map",
-        finalVideoLabel,
+        finalOutputLabel,
         "-map",
         "[aout]",
         "-preset",
@@ -454,7 +466,7 @@ export const mergeVideos = async (
         "-pix_fmt",
         "yuv420p",
         "-r",
-        "25", // Set output frame rate to 25 fps
+        "25",
       ])
       .on("start", (commandLine) => {
         console.log(`FFmpeg command: ${commandLine}`);
@@ -468,15 +480,6 @@ export const mergeVideos = async (
               message: "Error sending merged video",
               error: err.message,
             });
-          }
-        });
-
-        res.on("finish", () => {
-          console.log("Response finished. Cleaning up temp files.");
-          try {
-            fs.rmSync(tempDir, { recursive: true, force: true });
-          } catch (err) {
-            console.error("Error cleaning up temp files:", err);
           }
         });
       })
@@ -493,4 +496,18 @@ export const mergeVideos = async (
   } catch (err) {
     next(err);
   }
+};
+
+export const getSampleVideos = (req: Request, res: Response) => {
+  res.status(200).json({
+    success: true,
+    videos: videosTemplate,
+  });
+};
+
+export const getSampleImages = (req: Request, res: Response) => {
+  res.status(200).json({
+    success: true,
+    images: imagesTemplate,
+  });
 };

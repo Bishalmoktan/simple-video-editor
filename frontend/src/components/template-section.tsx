@@ -1,16 +1,20 @@
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { useModal } from "@/context/modal-context";
 
 export type TemplateSectionProps = {
   title: string;
-  images: string[];
+  images?: string[];
+  videos?: string[];
 };
 
 export default function TemplateSection({
   title,
   images,
+  videos,
 }: TemplateSectionProps) {
+  const { openModal } = useModal();
   return (
     <div className="w-full">
       <div className="flex flex-col md:flex-row justify-between gap-2">
@@ -30,9 +34,42 @@ export default function TemplateSection({
       </div>
 
       <div className="responsive-flex">
-        {images.map((image, index) => (
-          <img className="rounded-xl" src={image} alt={image} key={index} />
-        ))}
+        {images &&
+          images.map((image, index) => (
+            <div
+              key={index}
+              onClick={() =>
+                openModal("imageImport", {
+                  title: "Import Image",
+                  imageSrc: image,
+                })
+              }
+            >
+              <img
+                className="rounded-xl w-[200px] h-[250px] object-cover cursor-pointer"
+                src={image}
+                alt={image}
+              />
+            </div>
+          ))}
+
+        {videos &&
+          videos.map((video, index) => (
+            <div
+              key={index}
+              onClick={() =>
+                openModal("videoImport", {
+                  title: "Import Video",
+                  videoSrc: video,
+                })
+              }
+            >
+              <video
+                src={video}
+                className="rounded-xl w-[200px] h-[250px] object-cover cursor-pointer"
+              />
+            </div>
+          ))}
       </div>
     </div>
   );

@@ -34,7 +34,7 @@ export default function AddImageVideo({
 
     openModal("uploadFile", {
       title: `${type === "video" ? "Video" : "Image"} Uploading`,
-      isUploading: true,
+      isLoading: true,
       progress: 0,
     });
 
@@ -47,7 +47,7 @@ export default function AddImageVideo({
               const progress = Math.round((event.loaded / event.total) * 100);
               openModal("uploadFile", {
                 title: `Video Uploading`,
-                isUploading: true,
+                isLoading: true,
                 progress: progress,
               });
             }
@@ -57,7 +57,7 @@ export default function AddImageVideo({
         if (response.success) {
           openModal("uploadFile", {
             title: `Video Uploading`,
-            isUploading: false,
+            isLoading: false,
             progress: 100,
           });
           setTimeout(() => closeModal(), 1500);
@@ -70,7 +70,7 @@ export default function AddImageVideo({
               {
                 name: file.name,
                 type: "video",
-                duration: video?.duration,
+                duration: `${video?.duration}`,
                 resolution: `${video.videoWidth}x${video.videoHeight}`,
                 videoUrl: video.src,
               },
@@ -106,7 +106,7 @@ export default function AddImageVideo({
               const progress = Math.round((event.loaded / event.total) * 100);
               openModal("uploadFile", {
                 title: `Image Uploading`,
-                isUploading: true,
+                isLoading: true,
                 progress: progress,
               });
             }
@@ -116,7 +116,7 @@ export default function AddImageVideo({
         if (response.success) {
           openModal("uploadFile", {
             title: `Image Uploading`,
-            isUploading: false,
+            isLoading: false,
             progress: 100,
           });
           setTimeout(() => closeModal(), 1500);

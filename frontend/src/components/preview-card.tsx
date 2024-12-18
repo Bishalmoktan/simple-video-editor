@@ -5,7 +5,7 @@ export type PreviewCardProps = {
   type: "first-image" | "last-image" | "video";
   name: string;
   resolution?: string;
-  duration?: number;
+  duration?: string;
   imageUrl?: string;
   videoUrl?: string;
 };
@@ -15,6 +15,7 @@ export default function PreviewCard({
   resolution,
   imageUrl,
   videoUrl,
+  duration,
 }: PreviewCardProps) {
   const { openModal } = useModal();
   const navigate = useNavigate();
@@ -35,15 +36,20 @@ export default function PreviewCard({
     <div onClick={handleClick} className="w-[220px] cursor-pointer">
       <div className="p-4 bg-primary-100 rounded-lg relative">
         {type === "video" ? (
-          videoUrl && <video src={videoUrl} controls className="rounded-lg" />
+          videoUrl && (
+            <video
+              src={videoUrl}
+              className="rounded-xl w-[300px] h-[200px] object-cover cursor-pointer"
+            />
+          )
         ) : (
           <img src={imageUrl} alt={name} className="rounded-lg" />
         )}
-        {/* {duration && (
+        {duration && (
           <div className="bg-gray-900 text-white absolute bg-opacity-60 p-1 text-xs left-6 bottom-2 rounded-md">
             {duration}
           </div>
-        )} */}
+        )}
       </div>
       <p>
         {type === "video" && "Name: "} {name}

@@ -21,7 +21,7 @@ const UploadProgressModal = () => {
     if (data?.progress) {
       setProgress(data.progress);
     }
-    if (data?.isUploading === false) {
+    if (data?.isLoading === false) {
       setIsComplete(true);
     }
 
