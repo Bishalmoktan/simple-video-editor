@@ -6,6 +6,7 @@ export const axiosClientFormData = axios.create({
   headers: {
     "Content-Type": "multipart/form-data",
   },
+  withCredentials: false,
 });
 
 export const axiosClient = axios.create({
