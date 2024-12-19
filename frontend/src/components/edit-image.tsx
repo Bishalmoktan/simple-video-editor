@@ -80,10 +80,10 @@ export default function EditImage({ type, imageUrl }: Props) {
   const elementStyles = {
     transition: "font-size 0.3s ease",
     display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "rgba(255, 255, 255, 0.7)",
+    justifyContent: "start",
     borderRadius: "4px",
+    border: "1px solid blue",
+    borderStyle: "dotted",
   };
 
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {

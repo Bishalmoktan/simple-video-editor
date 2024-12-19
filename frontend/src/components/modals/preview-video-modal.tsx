@@ -14,6 +14,7 @@ const PreviewVideoModal = () => {
   const handleClose = () => {
     closeModal();
   };
+
   return (
     <Dialog open={isModalOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[425px]">
