@@ -6,6 +6,7 @@ import { uploadImage, uploadVideo } from "@/services/api-service";
 import { AxiosError, AxiosProgressEvent } from "axios";
 import { useModal } from "@/context/modal-context";
 import { useAppContext } from "@/context/app-context";
+import { formatMilliseconds } from "@/lib/utils";
 
 type Props = {
   title: string;
@@ -70,7 +71,7 @@ export default function AddImageVideo({
               {
                 name: file.name,
                 type: "video",
-                duration: `${video?.duration}`,
+                duration: `${formatMilliseconds(video?.duration)}`,
                 resolution: `${video.videoWidth}x${video.videoHeight}`,
                 videoUrl: video.src,
               },
