@@ -31,7 +31,7 @@
   }
 
   .responsive-flex {
-    @apply flex justify-center md:justify-start flex-wrap gap-y-16 gap-x-2 my-2;
+    @apply flex justify-center md:justify-start flex-wrap sm:gap-y-16 md:gap-y-8 gap-x-2 my-2;
   }
 
   .btn-primary {

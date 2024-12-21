@@ -83,7 +83,7 @@ const createTextFilter = (
   const y = Math.round((position.y / 100) * 720);
 
   // Scale font size proportionally based on video resolution (1280x720)
-  const scaledFontSize = Math.round((fontSize / 100) * 300);
+  const scaledFontSize = Math.round((fontSize / 100) * 250);
 
   return `drawtext=text='${text}':
     fontfile='${fontFamily}':
@@ -195,13 +195,13 @@ export const createVideoFromImage = async (
 
       // Add logo with size and position adjustments if provided
       if (logoPath && parsedLogoPos) {
-        const x = Math.round((parsedLogoPos.x / 100) * 1280); // Position X in pixels based on 1280 width
-        const y = Math.round((parsedLogoPos.y / 100) * 720); // Position Y in pixels based on 720 height
+        const x = Math.round((parsedLogoPos.x / 100) * 1280);
+        const y = Math.round((parsedLogoPos.y / 100) * 720);
         const logoWidth = parsedLogoPos.width
-          ? Math.round((parsedLogoPos.width / 100) * 1280)
+          ? Math.round((parsedLogoPos.width / 100) * 1280) + 100
           : -1; // Width as percentage
         const logoHeight = parsedLogoPos.height
-          ? Math.round((parsedLogoPos.height / 100) * 720)
+          ? Math.round((parsedLogoPos.height / 100) * 720) + 50
           : -1; // Height as percentage
 
         // Add logo input with loop

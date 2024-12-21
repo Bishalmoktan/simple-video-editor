@@ -34,7 +34,17 @@ const PreviewVideo = () => {
         return;
       }
 
-      if (videoUrls.length - 1 !== transitions.length) {
+      let newTransitions: string[] = [];
+
+      if (transitions.length === 0) {
+        for (let i = 0; i < videoUrls.length - 1; i++) {
+          newTransitions[i] = "fade";
+        }
+      } else {
+        newTransitions = transitions;
+      }
+
+      if (videoUrls.length - 1 !== newTransitions.length) {
         toast({
           title: "Invalid transition",
           description:
@@ -55,7 +65,7 @@ const PreviewVideo = () => {
           "/api/videos/merge-videos",
           {
             videoUrls,
-            transitions,
+            transitions: newTransitions,
             userType,
           },
           {

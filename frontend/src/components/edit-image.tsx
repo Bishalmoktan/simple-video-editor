@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Rnd } from "react-rnd";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,66 +11,37 @@ import { useModal } from "@/context/modal-context";
 import { useToast } from "@/hooks/use-toast";
 import { AxiosError } from "axios";
 import { useAppContext } from "@/context/app-context";
+import { useEditImageContext } from "@/context/edit-image-context";
 
 type Props = {
   type: "lastImage" | "firstImage";
   imageUrl: string;
 };
 
-type Position = {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-};
-
 export default function EditImage({ type, imageUrl }: Props) {
-  const [title, setTitle] = useState("Your Title");
-  const [subtitle, setSubtitle] = useState("Your Subtitle");
-  const [logo, setLogo] = useState<string | null>(null);
-  const [duration, setDuration] = useState("1");
   const [videoUrl, setVideoUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [enablePreview, setEnablePreview] = useState(false);
-  const [titleFontSize, setTitleFontSize] = useState("48");
-  const [subtitleFontSize, setSubtitleFontSize] = useState("32");
-  const [fontFamily, setFontFamily] = useState("Arial");
-  const [textColor, setTextColor] = useState("#000000");
-  const [transition, setTransition] = useState("fade");
 
   const { setFirstImageVideo, setLastImageVideo } = useAppContext();
+  const {
+    firstImageState,
+    setFirstImageState,
+    lastImageState,
+    setLastImageState,
+  } = useEditImageContext();
+
+  const imageState = type === "firstImage" ? firstImageState : lastImageState;
+  const setImageState =
+    type === "firstImage" ? setFirstImageState : setLastImageState;
 
   const fontFamilyOptions = [
-    "Arial",
-    "Times New Roman",
-    "Helvetica",
-    "Georgia",
-    "Verdana",
+    { text: "Arial", value: "Arial" },
+    { text: "Times New Roman", value: "Times New Roman" },
+    { text: "Helvetica", value: "Helvetica" },
+    { text: "Georgia", value: "Georgia" },
+    { text: "Verdana", value: "Verdana" },
   ];
-
-  const transitionOptions = ["None", "Fade"];
-
-  // State for element positions and sizes
-  const [titlePosition, setTitlePosition] = useState<Position>({
-    x: 16,
-    y: 16,
-    width: 200,
-    height: 40,
-  });
-
-  const [subtitlePosition, setSubtitlePosition] = useState<Position>({
-    x: 16,
-    y: 180,
-    width: 150,
-    height: 30,
-  });
-
-  const [logoPosition, setLogoPosition] = useState<Position>({
-    x: 290,
-    y: 16,
-    width: 48,
-    height: 48,
-  });
 
   const { toast } = useToast();
   const { openModal } = useModal();
@@ -91,12 +62,12 @@ export default function EditImage({ type, imageUrl }: Props) {
     const file = e.target.files?.[0];
     if (file) {
       const fileURL = URL.createObjectURL(file);
-      setLogo(fileURL);
+      setImageState((prevState) => ({ ...prevState, logo: fileURL }));
     }
   };
 
   const handleSave = async () => {
-    if (duration === "0") {
+    if (imageState.duration === "0") {
       toast({
         description: "Give duration at least 1 sec",
         variant: "destructive",
@@ -113,48 +84,47 @@ export default function EditImage({ type, imageUrl }: Props) {
       const containerHeight = container.offsetHeight;
 
       const titlePositionPercent = {
-        x: (titlePosition.x / containerWidth) * 100,
-        y: (titlePosition.y / containerHeight) * 100,
-        width: (titlePosition.width / containerWidth) * 100,
-        height: (titlePosition.height / containerHeight) * 100,
+        x: (imageState.titlePosition.x / containerWidth) * 100,
+        y: (imageState.titlePosition.y / containerHeight) * 100,
+        width: (imageState.titlePosition.width / containerWidth) * 100,
+        height: (imageState.titlePosition.height / containerHeight) * 100,
       };
 
       const subtitlePositionPercent = {
-        x: (subtitlePosition.x / containerWidth) * 100,
-        y: (subtitlePosition.y / containerHeight) * 100,
-        width: (subtitlePosition.width / containerWidth) * 100,
-        height: (subtitlePosition.height / containerHeight) * 100,
+        x: (imageState.subtitlePosition.x / containerWidth) * 100,
+        y: (imageState.subtitlePosition.y / containerHeight) * 100,
+        width: (imageState.subtitlePosition.width / containerWidth) * 100,
+        height: (imageState.subtitlePosition.height / containerHeight) * 100,
       };
 
       const formData = new FormData();
       formData.append("image", imageUrl);
-      formData.append("duration", duration);
-      formData.append("title", title);
-      formData.append("subtitle", subtitle);
+      formData.append("duration", imageState.duration);
+      formData.append("title", imageState.title);
+      formData.append("subtitle", imageState.subtitle);
       formData.append("titlePosition", JSON.stringify(titlePositionPercent));
       formData.append(
         "subtitlePosition",
         JSON.stringify(subtitlePositionPercent)
       );
-      formData.append("titleColor", textColor);
-      formData.append("subtitleColor", textColor);
-      formData.append("titleFontSize", titleFontSize);
-      formData.append("titleFontFamily", fontFamily);
-      formData.append("subtitleFontFamily", fontFamily);
-      formData.append("subtitleFontSize", subtitleFontSize);
-      formData.append("transitioin", transition);
+      formData.append("titleColor", imageState.textColor);
+      formData.append("subtitleColor", imageState.textColor);
+      formData.append("titleFontSize", imageState.titleFontSize);
+      formData.append("titleFontFamily", imageState.fontFamily);
+      formData.append("subtitleFontFamily", imageState.fontFamily);
+      formData.append("subtitleFontSize", imageState.subtitleFontSize);
 
-      if (logo) {
+      if (imageState.logo) {
         // Convert logo to blob and append
-        const response = await fetch(logo);
+        const response = await fetch(imageState.logo);
         const logoBlob = await response.blob();
         formData.append("logo", logoBlob, "logo.png");
 
         const logoPositionPercent = {
-          x: (logoPosition.x / containerWidth) * 100,
-          y: (logoPosition.y / containerHeight) * 100,
-          width: (logoPosition.width / containerWidth) * 100,
-          height: (logoPosition.height / containerHeight) * 100,
+          x: (imageState.logoPosition.x / containerWidth) * 100,
+          y: (imageState.logoPosition.y / containerHeight) * 100,
+          width: (imageState.logoPosition.width / containerWidth) * 100,
+          height: (imageState.logoPosition.height / containerHeight) * 100,
         };
         formData.append("logoPosition", JSON.stringify(logoPositionPercent));
       }
@@ -181,7 +151,7 @@ export default function EditImage({ type, imageUrl }: Props) {
       if (error instanceof AxiosError) {
         toast({
           title: "Error saving the image",
-          description: error.message,
+          description: error.response?.data.message,
           variant: "destructive",
         });
       } else {
@@ -202,17 +172,12 @@ export default function EditImage({ type, imageUrl }: Props) {
     });
   };
 
-  useEffect(() => {
-    setTitleFontSize(
-      `${Math.min(titlePosition.height * 0.6, titlePosition.width * 0.15)}`
-    );
-  }, [titlePosition]);
-
-  useEffect(() => {
-    setSubtitleFontSize(
-      `${Math.min(subtitlePosition.height * 0.6, subtitlePosition.width * 0.15)}`
-    );
-  }, [subtitlePosition]);
+  const setState = (value: string, key: string) => {
+    setImageState((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
 
   return (
     <div className="p-8">
@@ -220,7 +185,7 @@ export default function EditImage({ type, imageUrl }: Props) {
         <div>
           <h2 className="h2 text-center">Edit Your {image} Image</h2>
           <div className="flex justify-center items-center my-8">
-            <div className="relative w-[350px] h-[250px]" id="capture-area">
+            <div className="relative  aspect-video" id="capture-area">
               <img
                 className="rounded-md object-cover w-full h-full"
                 src={imageUrl}
@@ -229,19 +194,33 @@ export default function EditImage({ type, imageUrl }: Props) {
 
               {/* Title Element */}
               <Rnd
-                position={{ x: titlePosition.x, y: titlePosition.y }}
+                position={{
+                  x: imageState.titlePosition.x,
+                  y: imageState.titlePosition.y,
+                }}
                 onDragStop={(_e, d) => {
                   setEnablePreview(false);
-                  setTitlePosition((prev) => ({ ...prev, x: d.x, y: d.y }));
+                  setImageState((prev) => ({
+                    ...prev,
+                    titlePosition: {
+                      ...prev.titlePosition,
+                      x: d.x,
+                      y: d.y,
+                    },
+                  }));
                 }}
                 onResizeStop={(_e, _direction, ref, _delta, position) => {
                   setEnablePreview(false);
-                  setTitlePosition({
-                    width: parseInt(ref.style.width),
-                    height: parseInt(ref.style.height),
-                    x: position.x,
-                    y: position.y,
-                  });
+                  setImageState((prev) => ({
+                    ...prev,
+                    titlePosition: {
+                      ...prev.titlePosition,
+                      width: parseInt(ref.style.width),
+                      height: parseInt(ref.style.height),
+                      x: position.x,
+                      y: position.y,
+                    },
+                  }));
                 }}
                 minWidth={100}
                 minHeight={30}
@@ -253,31 +232,46 @@ export default function EditImage({ type, imageUrl }: Props) {
                 <div
                   style={{
                     ...elementStyles,
-                    fontSize: `${titleFontSize}px`,
+                    fontSize: `${imageState.titleFontSize}px`,
                     width: "100%",
                     height: "100%",
-                    color: textColor,
+                    color: imageState.textColor,
                   }}
+                  className="break-all"
                 >
-                  {title}
+                  {imageState.title}
                 </div>
               </Rnd>
 
               {/* Subtitle Element */}
               <Rnd
-                position={{ x: subtitlePosition.x, y: subtitlePosition.y }}
+                position={{
+                  x: imageState.subtitlePosition.x,
+                  y: imageState.subtitlePosition.y,
+                }}
                 onDragStop={(_e, d) => {
                   setEnablePreview(false);
-                  setSubtitlePosition((prev) => ({ ...prev, x: d.x, y: d.y }));
+                  setImageState((prev) => ({
+                    ...prev,
+                    subtitlePosition: {
+                      ...prev.titlePosition,
+                      x: d.x,
+                      y: d.y,
+                    },
+                  }));
                 }}
                 onResizeStop={(_e, _direction, ref, _delta, position) => {
                   setEnablePreview(false);
-                  setSubtitlePosition({
-                    width: parseInt(ref.style.width),
-                    height: parseInt(ref.style.height),
-                    x: position.x,
-                    y: position.y,
-                  });
+                  setImageState((prev) => ({
+                    ...prev,
+                    subtitlePosition: {
+                      ...prev.titlePosition,
+                      width: parseInt(ref.style.width),
+                      height: parseInt(ref.style.height),
+                      x: position.x,
+                      y: position.y,
+                    },
+                  }));
                 }}
                 minWidth={80}
                 minHeight={20}
@@ -289,32 +283,47 @@ export default function EditImage({ type, imageUrl }: Props) {
                 <div
                   style={{
                     ...elementStyles,
-                    fontSize: `${subtitleFontSize}}px`,
+                    fontSize: `${imageState.subtitleFontSize}px`,
                     width: "100%",
                     height: "100%",
-                    color: textColor,
+                    color: imageState.textColor,
                   }}
+                  className="break-all"
                 >
-                  {subtitle}
+                  {imageState.subtitle}
                 </div>
               </Rnd>
 
               {/* Logo Element */}
-              {logo && (
+              {imageState.logo && (
                 <Rnd
-                  position={{ x: logoPosition.x, y: logoPosition.y }}
+                  position={{
+                    x: imageState.logoPosition.x,
+                    y: imageState.logoPosition.y,
+                  }}
                   onDragStop={(_e, d) => {
                     setEnablePreview(false);
-                    setLogoPosition((prev) => ({ ...prev, x: d.x, y: d.y }));
+                    setImageState((prev) => ({
+                      ...prev,
+                      logoPosition: {
+                        ...prev.titlePosition,
+                        x: d.x,
+                        y: d.y,
+                      },
+                    }));
                   }}
                   onResizeStop={(_e, _direction, ref, _delta, position) => {
                     setEnablePreview(false);
-                    setLogoPosition({
-                      width: parseInt(ref.style.width),
-                      height: parseInt(ref.style.height),
-                      x: position.x,
-                      y: position.y,
-                    });
+                    setImageState((prev) => ({
+                      ...prev,
+                      logoPosition: {
+                        ...prev.titlePosition,
+                        width: parseInt(ref.style.width),
+                        height: parseInt(ref.style.height),
+                        x: position.x,
+                        y: position.y,
+                      },
+                    }));
                   }}
                   minWidth={30}
                   minHeight={30}
@@ -324,7 +333,7 @@ export default function EditImage({ type, imageUrl }: Props) {
                   className="z-10"
                 >
                   <img
-                    src={logo}
+                    src={imageState.logo}
                     alt="Logo"
                     style={{
                       width: "100%",
@@ -366,10 +375,10 @@ export default function EditImage({ type, imageUrl }: Props) {
               type="text"
               id="title"
               placeholder="Type here"
-              value={title}
+              value={imageState.title}
               onChange={(e) => {
                 setEnablePreview(false);
-                setTitle(e.target.value);
+                setState(e.target.value, "title");
               }}
             />
           </div>
@@ -379,10 +388,10 @@ export default function EditImage({ type, imageUrl }: Props) {
               Enter Subtitle
             </Label>
             <Input
-              value={subtitle}
+              value={imageState.subtitle}
               onChange={(e) => {
                 setEnablePreview(false);
-                setSubtitle(e.target.value);
+                setState(e.target.value, "subtitle");
               }}
               type="text"
               id="subtitle"
@@ -417,10 +426,10 @@ export default function EditImage({ type, imageUrl }: Props) {
               Enter duration of {image.toLowerCase()} image (seconds)
             </Label>
             <Input
-              value={duration}
+              value={imageState.duration}
               onChange={(e) => {
                 setEnablePreview(false);
-                setDuration(e.target.value);
+                setState(e.target.value, "duration");
               }}
               type="text"
               id="duration"
@@ -428,17 +437,41 @@ export default function EditImage({ type, imageUrl }: Props) {
             />
           </div>
 
-          <div className="grid w-full max-w-sm items-center gap-1.5">
-            <Label className="text-sm text-slate-500">Select Transition</Label>
-            <ImageSelectForm
-              label="Select Transition"
-              placeholder="Select Transition"
-              options={transitionOptions}
-              onChange={(value) => {
-                setTransition(value);
-                setEnablePreview(false);
-              }}
-            />
+          <div className="grid grid-cols-2 w-full max-w-sm items-center gap-1.5">
+            <div>
+              <Label htmlFor="titleFontSize" className="text-sm text-slate-500">
+                Title font size
+              </Label>
+
+              <Input
+                type="text"
+                id="titleFontSize"
+                value={imageState.titleFontSize}
+                onChange={(e) => {
+                  setEnablePreview(false);
+                  setState(e.target.value, "titleFontSize");
+                }}
+              />
+            </div>
+
+            <div>
+              <Label
+                htmlFor="subtitleFontSize"
+                className="text-sm text-slate-500"
+              >
+                Subtitle font size
+              </Label>
+
+              <Input
+                type="text"
+                id="subtitleFontSize"
+                value={imageState.subtitleFontSize}
+                onChange={(e) => {
+                  setEnablePreview(false);
+                  setState(e.target.value, "subtitleFontSize");
+                }}
+              />
+            </div>
           </div>
 
           <div className="grid grid-cols-2 w-full max-w-sm items-center gap-1.5">
@@ -450,9 +483,10 @@ export default function EditImage({ type, imageUrl }: Props) {
               <Input
                 type="color"
                 id="color"
+                value={imageState.textColor}
                 onChange={(e) => {
                   setEnablePreview(false);
-                  setTextColor(e.target.value);
+                  setState(e.target.value, "textColor");
                 }}
               />
             </div>
@@ -461,10 +495,11 @@ export default function EditImage({ type, imageUrl }: Props) {
               <ImageSelectForm
                 label="Select Font"
                 placeholder="Select Font"
+                value={imageState.fontFamily}
                 options={fontFamilyOptions}
                 onChange={(value) => {
                   setEnablePreview(false);
-                  setFontFamily(value);
+                  setState(value, "fontFamily");
                 }}
               />
             </div>

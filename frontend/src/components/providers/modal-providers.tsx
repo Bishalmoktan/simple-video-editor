@@ -1,3 +1,4 @@
+import DeleteModal from "../modals/delete-modal";
 import ImageImportModal from "../modals/image-import-modal";
 import InfoModal from "../modals/info-modal";
 import LoadingModal from "../modals/loading-modal";
@@ -14,6 +15,7 @@ const ModalProvider = () => {
       <VideoImportModal />
       <ImageImportModal />
       <InfoModal />
+      <DeleteModal />
     </>
   );
 };

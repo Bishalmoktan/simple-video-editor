@@ -55,7 +55,7 @@ const VideoImportModal = () => {
           <video
             src={data?.videoSrc}
             controls
-            className="rounded-xl w-[300px] h-[200px] object-cover cursor-pointer"
+            className="rounded-xl w-full h-[200px] object-cover cursor-pointer"
           ></video>
         </div>
         <DialogFooter>

@@ -48,7 +48,7 @@ const ImageImportModal = () => {
         <div className="flex justify-center flex-col items-center">
           <img
             src={data?.imageSrc}
-            className="rounded-xl w-[300px] h-[200px] object-cover cursor-pointer"
+            className="rounded-xl w-full h-[200px] object-cover cursor-pointer"
           />
         </div>
         <DialogFooter className="gap-2">

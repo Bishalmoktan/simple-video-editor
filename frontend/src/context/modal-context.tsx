@@ -6,7 +6,8 @@ type ModalType =
   | "loading"
   | "videoImport"
   | "imageImport"
-  | "infoModal";
+  | "infoModal"
+  | "deleteModal";
 
 type ModalDataType = {
   title: string;
