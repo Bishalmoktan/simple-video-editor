@@ -30,7 +30,7 @@ const VideoImportModal = () => {
         setVideos((prev) => [
           ...prev,
           {
-            name: "Imported Video",
+            name: data.title,
             type: "video",
             duration: formatMilliseconds(video.duration!),
             resolution: `${video.videoWidth}x${video.videoHeight}`,

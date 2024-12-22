@@ -43,11 +43,10 @@ const ApplyTransitions = () => {
   };
 
   useEffect(() => {
-    // If transitions are not already set, initialize them to the default values (like 'none')
     if (videoUrls.length && transitions.length === 0) {
       setTransitions(new Array(videoUrls.length - 1).fill("fade"));
     }
-  }, [videoUrls.length, transitions, setTransitions]);
+  }, [videoUrls.length]);
 
   return (
     <div className="p-5">

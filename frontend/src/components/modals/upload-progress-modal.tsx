@@ -43,7 +43,7 @@ const UploadProgressModal = () => {
           ) : (
             <>
               <FaCheckCircle className="text-green-500 transition-all duration-300 ease-in-out opacity-100 size-10" />
-              <span>Upload Complete</span>
+              <span>{data?.description}</span>
             </>
           )}
         </div>

@@ -60,6 +60,7 @@ export default function AddImageVideo({
             title: `Video Uploading`,
             isLoading: false,
             progress: 100,
+            description: "Upload Complete",
           });
           setTimeout(() => closeModal(), 1500);
           const video = document.createElement("video");
@@ -119,6 +120,7 @@ export default function AddImageVideo({
             title: `Image Uploading`,
             isLoading: false,
             progress: 100,
+            description: "Upload Complete",
           });
           setTimeout(() => closeModal(), 1500);
           if (type === "first-image") {

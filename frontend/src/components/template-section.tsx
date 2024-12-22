@@ -76,7 +76,7 @@ export default function TemplateSection({
             key={index}
             onClick={() =>
               openModal("videoImport", {
-                title: "Import Video",
+                title: video.name,
                 videoSrc: video.videoUrl,
               })
             }
