@@ -5,6 +5,12 @@ import { useNavigate } from "react-router-dom";
 export type PreviewCardProps = {
   type: "first-image" | "last-image" | "video";
   name: string;
+  index?: number;
+  draggable?: boolean;
+  onDragStart?: (e: React.DragEvent, index: number) => void;
+  onDragEnd?: (e: React.DragEvent) => void;
+  onDragOver?: (e: React.DragEvent) => void;
+  onDrop?: (e: React.DragEvent, index: number) => void;
   resolution?: string;
   duration?: string;
   imageUrl?: string;
@@ -18,11 +24,20 @@ export default function PreviewCard({
   imageUrl,
   videoUrl,
   duration,
+  index = -1,
+  draggable = false,
+  onDragStart,
+  onDragEnd,
+  onDragOver,
+  onDrop,
 }: PreviewCardProps) {
   const { openModal } = useModal();
   const navigate = useNavigate();
 
-  const handlePreviewClick = () => {
+  const handlePreviewClick = (e: React.MouseEvent) => {
+    // Prevent click when dragging
+    if (e.defaultPrevented) return;
+
     if (type === "video" && videoUrl) {
       openModal("previewVideo", {
         title: name,
@@ -35,6 +50,7 @@ export default function PreviewCard({
 
   const handleDeleteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
+    e.preventDefault();
     if (type === "video" && videoUrl) {
       openModal("deleteModal", {
         title: "Delete video",
@@ -44,7 +60,17 @@ export default function PreviewCard({
   };
 
   return (
-    <div onClick={handlePreviewClick} className="cursor-pointer">
+    <div
+      draggable={draggable}
+      onDragStart={(e) => onDragStart?.(e, index)}
+      onDragEnd={onDragEnd}
+      onDragOver={(e) => {
+        onDragOver?.(e);
+      }}
+      onDrop={(e) => onDrop?.(e, index)}
+      onClick={handlePreviewClick}
+      className={`relative cursor-pointer transition-all duration-200`}
+    >
       <div className="p-4 bg-primary-100 rounded-lg relative mb-2">
         {type === "video" ? (
           videoUrl ? (

@@ -13,7 +13,7 @@ import { axiosClient } from "@/services/api-service";
 const Home = () => {
   const [templates, setTemplates] = useState<TemplateSectionProps | null>(null);
 
-  const { videos } = useAppContext();
+  const { videos, setVideos } = useAppContext();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -41,6 +41,35 @@ const Home = () => {
     getSampleVideos();
   }, []);
 
+  // Drag and drop handlers
+  const handleDragStart = (e: React.DragEvent, index: number) => {
+    e.dataTransfer.setData("text/plain", index.toString());
+    const draggedElement = e.currentTarget as HTMLElement;
+    draggedElement.classList.add("opacity-50");
+  };
+
+  const handleDragEnd = (e: React.DragEvent) => {
+    const draggedElement = e.currentTarget as HTMLElement;
+    draggedElement.classList.remove("opacity-50");
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (e: React.DragEvent, dropIndex: number) => {
+    e.preventDefault();
+    const dragIndex = parseInt(e.dataTransfer.getData("text/plain"));
+
+    if (dragIndex === dropIndex) return;
+
+    const newVideos = [...videos];
+    const [draggedVideo] = newVideos.splice(dragIndex, 1);
+    newVideos.splice(dropIndex, 0, draggedVideo);
+
+    setVideos(newVideos);
+  };
+
   return (
     <section className="px-8 py-4 space-y-8">
       {/* add video section  */}
@@ -58,7 +87,16 @@ const Home = () => {
         <h2 className="h2">Create your first video in minutes</h2>
         <div className="responsive-flex">
           {videos.map((video, index) => (
-            <PreviewCard key={index} {...video} />
+            <PreviewCard
+              key={index}
+              {...video}
+              index={index}
+              draggable={true}
+              onDragStart={handleDragStart}
+              onDragOver={handleDragOver}
+              onDragEnd={handleDragEnd}
+              onDrop={handleDrop}
+            />
           ))}
           {videos.length === 0 && <div>No videos added.</div>}
         </div>
