@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Rnd } from "react-rnd";
+import html2canvas from "html2canvas";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -22,6 +23,9 @@ export default function EditImage({ type, imageUrl }: Props) {
   const [videoUrl, setVideoUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [enablePreview, setEnablePreview] = useState(false);
+
+  const titleRef = useRef<HTMLDivElement | null>(null);
+  const subtitleRef = useRef<HTMLDivElement | null>(null);
 
   const { setFirstImageVideo, setLastImageVideo } = useAppContext();
   const {
@@ -53,7 +57,6 @@ export default function EditImage({ type, imageUrl }: Props) {
     display: "flex",
     justifyContent: "start",
     borderRadius: "4px",
-    border: "1px solid blue",
     borderStyle: "dotted",
   };
 
@@ -74,84 +77,52 @@ export default function EditImage({ type, imageUrl }: Props) {
       });
       return;
     }
+    if (titleRef.current && subtitleRef.current) {
+      titleRef.current.style.border = "none";
+      subtitleRef.current.style.border = "none";
+    }
+    setLoading(true);
 
     try {
-      setLoading(true);
-
-      // Convert positions to percentages relative to container size
-      const container = document.getElementById("capture-area")!;
-      const containerWidth = container.offsetWidth;
-      const containerHeight = container.offsetHeight;
-
-      const titlePositionPercent = {
-        x: (imageState.titlePosition.x / containerWidth) * 100,
-        y: (imageState.titlePosition.y / containerHeight) * 100,
-        width: (imageState.titlePosition.width / containerWidth) * 100,
-        height: (imageState.titlePosition.height / containerHeight) * 100,
-      };
-
-      const subtitlePositionPercent = {
-        x: (imageState.subtitlePosition.x / containerWidth) * 100,
-        y: (imageState.subtitlePosition.y / containerHeight) * 100,
-        width: (imageState.subtitlePosition.width / containerWidth) * 100,
-        height: (imageState.subtitlePosition.height / containerHeight) * 100,
-      };
-
-      const formData = new FormData();
-      formData.append("image", imageUrl);
-      formData.append("duration", imageState.duration);
-      formData.append("title", imageState.title);
-      formData.append("subtitle", imageState.subtitle);
-      formData.append("titlePosition", JSON.stringify(titlePositionPercent));
-      formData.append(
-        "subtitlePosition",
-        JSON.stringify(subtitlePositionPercent)
+      // Capture the screenshot from the element
+      const canvas = await html2canvas(
+        document.getElementById("capture-area")!,
+        {
+          useCORS: true,
+        }
       );
-      formData.append("titleColor", imageState.textColor);
-      formData.append("subtitleColor", imageState.textColor);
-      formData.append("titleFontSize", imageState.titleFontSize);
-      formData.append("titleFontFamily", imageState.fontFamily);
-      formData.append("subtitleFontFamily", imageState.fontFamily);
-      formData.append("subtitleFontSize", imageState.subtitleFontSize);
-
-      if (imageState.logo) {
-        // Convert logo to blob and append
-        const response = await fetch(imageState.logo);
-        const logoBlob = await response.blob();
-        formData.append("logo", logoBlob, "logo.png");
-
-        const logoPositionPercent = {
-          x: (imageState.logoPosition.x / containerWidth) * 100,
-          y: (imageState.logoPosition.y / containerHeight) * 100,
-          width: (imageState.logoPosition.width / containerWidth) * 100,
-          height: (imageState.logoPosition.height / containerHeight) * 100,
-        };
-        formData.append("logoPosition", JSON.stringify(logoPositionPercent));
-      }
-
-      const res = await axiosClientFormData.post(
-        "/api/videos/create-image-video",
-        formData
-      );
-
-      setVideoUrl(res.data.videoUrl);
-      if (type === "firstImage") {
-        setFirstImageVideo(`${env.API_BASE_URL}${res.data.videoUrl}`);
-      } else {
-        setLastImageVideo(`${env.API_BASE_URL}${res.data.videoUrl}`);
-      }
-      setEnablePreview(true);
-      toast({
-        title: "Video generated!",
-        description: "Click preview to see the video",
-        variant: "success",
-      });
+      // Convert canvas to Blob
+      canvas.toBlob(async (blob) => {
+        if (blob) {
+          // Create FormData to send the image
+          const formData = new FormData();
+          formData.append("image", blob, "image.png");
+          formData.append("duration", imageState.duration);
+          // Send the Blob data via POST request
+          const res = await axiosClientFormData.post(
+            "/api/videos/create-image-video",
+            formData
+          );
+          setVideoUrl(res.data.videoUrl);
+          if (type === "firstImage") {
+            setFirstImageVideo(`${env.API_BASE_URL}${res.data.videoUrl}`);
+          } else {
+            setLastImageVideo(`${env.API_BASE_URL}${res.data.videoUrl}`);
+          }
+          setEnablePreview(true);
+          toast({
+            title: "Video generated!",
+            description: "Click preview to see the video",
+            variant: "success",
+          });
+        }
+      }, "image/png");
     } catch (error) {
       console.error("Error saving image:", error);
       if (error instanceof AxiosError) {
         toast({
           title: "Error saving the image",
-          description: error.response?.data.message,
+          description: error.response?.data.error,
           variant: "destructive",
         });
       } else {
@@ -162,6 +133,10 @@ export default function EditImage({ type, imageUrl }: Props) {
       }
     } finally {
       setLoading(false);
+      if (titleRef.current && subtitleRef.current) {
+        titleRef.current.style.border = "1px solid blue";
+        subtitleRef.current.style.border = "1px solid blue";
+      }
     }
   };
 
@@ -236,7 +211,9 @@ export default function EditImage({ type, imageUrl }: Props) {
                     width: "100%",
                     height: "100%",
                     color: imageState.textColor,
+                    border: "1px solid blue",
                   }}
+                  ref={titleRef}
                   className="break-all"
                 >
                   {imageState.title}
@@ -287,8 +264,10 @@ export default function EditImage({ type, imageUrl }: Props) {
                     width: "100%",
                     height: "100%",
                     color: imageState.textColor,
+                    border: loading ? "none" : "1px solid blue",
                   }}
                   className="break-all"
+                  ref={subtitleRef}
                 >
                   {imageState.subtitle}
                 </div>

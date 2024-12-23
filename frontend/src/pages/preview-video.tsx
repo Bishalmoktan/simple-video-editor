@@ -115,7 +115,11 @@ const PreviewVideo = () => {
       {video ? (
         <div className="flex justify-center py-16 items-center flex-col gap-8">
           <div>
-            <video src={video} controls className="rounded-md w-[500px]" />
+            <video
+              src={video}
+              controls
+              className="rounded-md w-[500px] object-contain"
+            />
           </div>
           <div className="space-x-2">
             <Button className="btn-primary">

@@ -26,7 +26,7 @@ const PreviewVideoModal = () => {
           <video
             src={data?.videoSrc}
             controls
-            className="rounded-xl w-full h-[200px] object-cover cursor-pointer"
+            className="rounded-xl w-full cursor-pointer"
           ></video>
         </div>
       </DialogContent>
