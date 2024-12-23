@@ -3,6 +3,8 @@ import React, {
   createContext,
   SetStateAction,
   useContext,
+  useEffect,
+  useMemo,
   useState,
 } from "react";
 
@@ -19,6 +21,11 @@ type AppContextType = {
   setLastImageVideo: React.Dispatch<SetStateAction<string | null>>;
   transitions: string[];
   setTransitions: React.Dispatch<SetStateAction<string[]>>;
+  runMerging: boolean;
+  setRunMerging: React.Dispatch<SetStateAction<boolean>>;
+  videoUrls: (string | undefined)[];
+  mergedVideo: string | null;
+  setMergedVideo: React.Dispatch<SetStateAction<string | null>>;
 };
 
 export const AppContext = createContext<AppContextType | null>(null);
@@ -34,6 +41,29 @@ export const AppContextProvider = ({
   const [lastImage, setLastImage] = useState<PreviewCardProps | null>(null);
   const [lastImageVideo, setLastImageVideo] = useState<string | null>(null);
   const [transitions, setTransitions] = useState<string[]>([]);
+  const [mergedVideo, setMergedVideo] = useState<string | null>(null);
+  const [runMerging, setRunMerging] = useState<boolean>(false);
+
+  const videoUrls = useMemo(() => {
+    const urls = videos.map((video) => video.videoUrl);
+    if (firstImageVideo) {
+      urls.unshift(firstImageVideo);
+    }
+    if (lastImageVideo) {
+      urls.push(lastImageVideo);
+    }
+    return urls;
+  }, [videos, firstImageVideo, lastImageVideo]);
+
+  useEffect(() => {
+    setRunMerging(true);
+  }, [videos, firstImageVideo, lastImageVideo, transitions]);
+
+  useEffect(() => {
+    if (videoUrls.length) {
+      setTransitions(new Array(videoUrls.length - 1).fill("fade"));
+    }
+  }, [videos, firstImageVideo, lastImageVideo]);
 
   return (
     <AppContext.Provider
@@ -50,6 +80,11 @@ export const AppContextProvider = ({
         setLastImageVideo,
         transitions,
         setTransitions,
+        runMerging,
+        setRunMerging,
+        videoUrls,
+        mergedVideo,
+        setMergedVideo,
       }}
     >
       {children}

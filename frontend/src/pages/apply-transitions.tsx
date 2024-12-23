@@ -1,12 +1,11 @@
-import { useEffect, useMemo } from "react";
 import ImageSelectForm from "@/components/image-select-form";
 import { Label } from "@/components/ui/label";
 import { useAppContext } from "@/context/app-context";
 
 const transitionOptions = [
   { text: "Fade", value: "fade" },
-  { text: "Wipe Left", value: "wideleft" },
-  { text: "Wipe Right", value: "wideright" },
+  { text: "Wipe Left", value: "wipeleft" },
+  { text: "Wipe Right", value: "wiperight" },
   { text: "Slide Up", value: "slideup" },
   { text: "Slide Down", value: "slidedown" },
   { text: "Circle Open", value: "circleopen" },
@@ -14,24 +13,7 @@ const transitionOptions = [
 ];
 
 const ApplyTransitions = () => {
-  const {
-    firstImageVideo,
-    lastImageVideo,
-    videos,
-    setTransitions,
-    transitions,
-  } = useAppContext();
-
-  const videoUrls = useMemo(() => {
-    const urls = videos.map((video) => video.videoUrl);
-    if (firstImageVideo) {
-      urls.unshift(firstImageVideo);
-    }
-    if (lastImageVideo) {
-      urls.push(lastImageVideo);
-    }
-    return urls;
-  }, [videos, firstImageVideo, lastImageVideo]);
+  const { setTransitions, transitions, videoUrls } = useAppContext();
 
   const handleTransitionChange = (index: number, value: string) => {
     const normalizedValue = value.toLowerCase().replace(/\s+/g, "");
@@ -41,12 +23,6 @@ const ApplyTransitions = () => {
       return updatedTransitions;
     });
   };
-
-  useEffect(() => {
-    if (videoUrls.length && transitions.length === 0) {
-      setTransitions(new Array(videoUrls.length - 1).fill("fade"));
-    }
-  }, [videoUrls.length]);
 
   return (
     <div className="p-5">

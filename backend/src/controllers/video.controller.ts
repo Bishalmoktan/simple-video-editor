@@ -7,6 +7,7 @@ import multer from "multer";
 import axios from "axios";
 import ffmpegPath from "ffmpeg-static";
 import { imagesTemplate, videosTemplate } from "../data/data";
+import AppError from "../utils/appError";
 
 if (ffmpegPath) {
   ffmpeg.setFfmpegPath(ffmpegPath);
@@ -138,8 +139,7 @@ export const mergeVideos = async (
   const { videoUrls, transitions, userType = "free" } = req.body; // Add userType to request body
   console.log(videoUrls);
   if (!videoUrls || videoUrls.length === 1) {
-    res.status(400).json({ message: "Provide at least two videos" });
-    return;
+    throw new AppError("Please provide at least two videos", 400);
   }
 
   try {
@@ -155,8 +155,7 @@ export const mergeVideos = async (
     }
 
     if (mediaFiles.length === 0) {
-      res.status(400).json({ message: "No media files to process" });
-      return;
+      throw new AppError("No media files to process", 400);
     }
 
     // Get media info for each file
@@ -184,10 +183,10 @@ export const mergeVideos = async (
 
     if (transitions && Array.isArray(transitions)) {
       if (transitions.length !== expectedTransitions) {
-        res.status(400).json({
-          message: `Number of transitions (${transitions.length}) does not match the required number (${expectedTransitions})`,
-        });
-        return;
+        throw new AppError(
+          `Number of transitions (${transitions.length}) does not match the required number (${expectedTransitions})`,
+          400
+        );
       }
       transitionsArray = transitions;
     } else {
@@ -206,10 +205,7 @@ export const mergeVideos = async (
     ];
 
     if (!transitionsArray.every((t) => supportedTransitions.includes(t))) {
-      res
-        .status(400)
-        .json({ message: "One or more unsupported transitions provided." });
-      return;
+      throw new AppError("One or more unsupported transitions provided.", 400);
     }
 
     // Build the FFmpeg command

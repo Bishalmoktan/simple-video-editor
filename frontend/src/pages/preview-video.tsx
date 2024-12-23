@@ -7,9 +7,16 @@ import { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 
 const PreviewVideo = () => {
-  const { firstImageVideo, lastImageVideo, videos, transitions } =
-    useAppContext();
-  const [video, setVideo] = useState<string | null>(null);
+  const {
+    firstImageVideo,
+    lastImageVideo,
+    videos,
+    transitions,
+    runMerging,
+    setRunMerging,
+    mergedVideo,
+    setMergedVideo,
+  } = useAppContext();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const { openModal, closeModal } = useModal();
@@ -76,11 +83,13 @@ const PreviewVideo = () => {
 
         const videoObjectUrl = URL.createObjectURL(videoBlob);
 
-        setVideo(videoObjectUrl);
+        setMergedVideo(videoObjectUrl);
       } catch (error) {
         if (error instanceof AxiosError) {
+          const text = new TextDecoder().decode(error.response?.data);
+          const data = JSON.parse(text);
           toast({
-            description: error.message,
+            description: data.message,
             variant: "destructive",
           });
         } else {
@@ -91,11 +100,13 @@ const PreviewVideo = () => {
         }
       } finally {
         setLoading(false);
+        setRunMerging(false);
       }
     };
-
-    mergeVideos();
-  }, []);
+    if (runMerging) {
+      mergeVideos();
+    }
+  }, [firstImageVideo, lastImageVideo, videos, transitions]);
 
   useEffect(() => {
     if (loading) {
@@ -112,18 +123,18 @@ const PreviewVideo = () => {
   return (
     <div className="p-8">
       <h2 className="h2">Preview your video</h2>
-      {video ? (
+      {mergedVideo ? (
         <div className="flex justify-center py-16 items-center flex-col gap-8">
           <div>
             <video
-              src={video}
+              src={mergedVideo}
               controls
               className="rounded-md w-[500px] object-contain"
             />
           </div>
           <div className="space-x-2">
             <Button className="btn-primary">
-              <a href={video} download={"mergedVideo.mp4"}>
+              <a href={mergedVideo} download={"mergedVideo.mp4"}>
                 {" "}
                 Download
               </a>

@@ -212,6 +212,7 @@ export default function EditImage({ type, imageUrl }: Props) {
                     height: "100%",
                     color: imageState.textColor,
                     border: "1px solid blue",
+                    fontFamily: `${imageState.fontFamily}`,
                   }}
                   ref={titleRef}
                   className="break-all"
@@ -264,7 +265,8 @@ export default function EditImage({ type, imageUrl }: Props) {
                     width: "100%",
                     height: "100%",
                     color: imageState.textColor,
-                    border: loading ? "none" : "1px solid blue",
+                    border: "1px solid blue",
+                    fontFamily: `${imageState.fontFamily}`,
                   }}
                   className="break-all"
                   ref={subtitleRef}
