@@ -8,6 +8,7 @@ import axios from "axios";
 import ffmpegPath from "ffmpeg-static";
 import { imagesTemplate, videosTemplate } from "../data/data";
 import AppError from "../utils/appError";
+import { ensureDirectoryExists } from "../utils/utils";
 
 if (ffmpegPath) {
   ffmpeg.setFfmpegPath(ffmpegPath);
@@ -19,9 +20,7 @@ ffmpeg.setFfprobePath(ffprobePath);
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const uploadDir = path.join(__dirname, "../uploads");
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
+    ensureDirectoryExists(uploadDir);
     cb(null, uploadDir);
   },
   filename: (req, file, cb) => {
@@ -38,11 +37,7 @@ const downloadFile = async (url: string, type: "video" | "image") => {
     `${type}-${Date.now()}.mp4`
   );
 
-  // Ensure downloads directory exists
-  const downloadDir = path.dirname(downloadPath);
-  if (!fs.existsSync(downloadDir)) {
-    fs.mkdirSync(downloadDir, { recursive: true });
-  }
+  ensureDirectoryExists(path.dirname(downloadPath));
 
   const response = await axios({
     url,
@@ -80,6 +75,8 @@ export const createVideoFromImage = async (
 
       const date = Date.now();
 
+      const tempDir = path.join(__dirname, "../output");
+      ensureDirectoryExists(tempDir);
       const outputPath = path.join(__dirname, "../output", `video-${date}.mp4`);
 
       // Create the video using FFmpeg
@@ -171,9 +168,7 @@ export const mergeVideos = async (
     }
 
     const tempDir = path.join(__dirname, "../output");
-    if (!fs.existsSync(tempDir)) {
-      fs.mkdirSync(tempDir, { recursive: true });
-    }
+    ensureDirectoryExists(tempDir);
 
     const outputVideoPath = path.join(tempDir, "output.mp4");
 
