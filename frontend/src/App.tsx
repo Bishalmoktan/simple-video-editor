@@ -15,25 +15,30 @@ import { ModalContextProvider } from "@/context/modal-context.tsx";
 import ModalProvider from "@/components/providers/modal-providers";
 import { Toaster } from "@/components/ui/toaster";
 import { EditImageProvider } from "@/context/edit-image-context";
+import { FullscreenProvider } from "@/context/full-screen-context";
+import FullscreenButton from "@/components/full-screen-button";
 
 // Shared Layout Component
 const Layout: React.FC = () => {
   return (
     <>
-      <ModalContextProvider>
-        <AppSidebar />
-        <main className="w-screen">
-          <SidebarTrigger />
-          <div className="relative">
-            <div className="bg-gradient-to-b from-[rgba(0,170,255,0.3)] to-[rgba(255,255,255,0.5)] absolute top-0 w-full h-48 -z-10"></div>
-            <EditImageProvider>
-              <Outlet />
-            </EditImageProvider>
-            <ModalProvider />
-          </div>
-          <Toaster />
-        </main>
-      </ModalContextProvider>
+      <FullscreenProvider>
+        <ModalContextProvider>
+          <AppSidebar />
+          <main className="w-screen">
+            <FullscreenButton />
+            <SidebarTrigger />
+            <div className="relative">
+              <div className="bg-gradient-to-b from-[rgba(0,170,255,0.3)] to-[rgba(255,255,255,0.5)] absolute top-0 w-full h-48 -z-10"></div>
+              <EditImageProvider>
+                <Outlet />
+              </EditImageProvider>
+              <ModalProvider />
+            </div>
+            <Toaster />
+          </main>
+        </ModalContextProvider>
+      </FullscreenProvider>
     </>
   );
 };
