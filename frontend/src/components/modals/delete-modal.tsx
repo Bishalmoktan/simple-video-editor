@@ -21,13 +21,9 @@ const DeleteModal = () => {
   };
 
   const handleDelete = () => {
-    if (data?.videoSrc) {
-      setVideos((prev) =>
-        prev.filter((video) => video.videoUrl !== data.videoSrc)
-      );
-      setTransitions([]);
-      handleClose();
-    }
+    setVideos((prev) => prev.filter((video) => video.index !== data?.index));
+    setTransitions([]);
+    handleClose();
   };
 
   return (

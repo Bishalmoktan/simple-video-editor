@@ -5,6 +5,7 @@ import { Separator } from "@/components/ui/separator";
 import { useModal } from "@/context/modal-context";
 
 export type TemplateSectionProps = {
+  id?: string;
   title: string;
   images?: {
     imageUrl: string;

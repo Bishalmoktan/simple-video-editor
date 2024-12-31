@@ -30,6 +30,7 @@ const VideoImportModal = () => {
         setVideos((prev) => [
           ...prev,
           {
+            index: prev.length,
             name: data.title,
             type: "video",
             duration: formatMilliseconds(video.duration!),

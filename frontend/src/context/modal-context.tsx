@@ -10,6 +10,7 @@ type ModalType =
   | "deleteModal";
 
 type ModalDataType = {
+  index?: number;
   title: string;
   videoSrc?: string;
   progress?: number;

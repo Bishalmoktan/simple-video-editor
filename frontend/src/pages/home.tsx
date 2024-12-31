@@ -90,7 +90,7 @@ const Home = () => {
             <PreviewCard
               key={index}
               {...video}
-              index={index}
+              index={video.index}
               draggable={true}
               onDragStart={handleDragStart}
               onDragOver={handleDragOver}

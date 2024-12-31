@@ -160,7 +160,10 @@ export default function EditImage({ type, imageUrl }: Props) {
         <div>
           <h2 className="h2 text-center">Edit Your {image} Image</h2>
           <div className="flex justify-center items-center my-8">
-            <div className="relative  aspect-video" id="capture-area">
+            <div
+              className="relative  aspect-video overflow-hidden"
+              id="capture-area"
+            >
               <img
                 className="rounded-md object-cover w-full h-full"
                 src={imageUrl}
@@ -199,8 +202,6 @@ export default function EditImage({ type, imageUrl }: Props) {
                 }}
                 minWidth={100}
                 minHeight={30}
-                maxWidth={300}
-                maxHeight={80}
                 bounds="parent"
                 className="z-10"
               >
@@ -253,8 +254,6 @@ export default function EditImage({ type, imageUrl }: Props) {
                 }}
                 minWidth={80}
                 minHeight={20}
-                maxWidth={250}
-                maxHeight={60}
                 bounds="parent"
                 className="z-10"
               >
@@ -331,11 +330,10 @@ export default function EditImage({ type, imageUrl }: Props) {
             <Button
               onClick={handleSave}
               className="btn-primary"
-              disabled={loading}
+              disabled={enablePreview}
             >
               {loading ? "Saving..." : "Save"}
             </Button>
-            <Button className="btn-primary">Edit</Button>
             <Button
               onClick={handlePreview}
               className="btn-primary"

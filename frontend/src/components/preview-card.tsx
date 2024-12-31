@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 export type PreviewCardProps = {
   type: "first-image" | "last-image" | "video";
   name: string;
-  index?: number;
+  index: number;
   draggable?: boolean;
   onDragStart?: (e: React.DragEvent, index: number) => void;
   onDragEnd?: (e: React.DragEvent) => void;
@@ -24,7 +24,7 @@ export default function PreviewCard({
   imageUrl,
   videoUrl,
   duration,
-  index = -1,
+  index,
   draggable = false,
   onDragStart,
   onDragEnd,
@@ -55,6 +55,7 @@ export default function PreviewCard({
       openModal("deleteModal", {
         title: "Delete video",
         videoSrc: videoUrl,
+        index,
       });
     }
   };

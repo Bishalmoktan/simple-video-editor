@@ -15,7 +15,7 @@ const LoadingModal = () => {
 
   return (
     <Dialog open={isModalOpen}>
-      <DialogContent className="sm:max-w-[425px]" hidden>
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader className="text-center">
           <DialogTitle>{data?.title}</DialogTitle>
         </DialogHeader>
