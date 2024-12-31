@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 export type PreviewCardProps = {
   type: "first-image" | "last-image" | "video";
   name: string;
-  index: number;
+  index?: number;
   draggable?: boolean;
   onDragStart?: (e: React.DragEvent, index: number) => void;
   onDragEnd?: (e: React.DragEvent) => void;
@@ -63,12 +63,12 @@ export default function PreviewCard({
   return (
     <div
       draggable={draggable}
-      onDragStart={(e) => onDragStart?.(e, index)}
+      onDragStart={(e) => onDragStart?.(e, index!)}
       onDragEnd={onDragEnd}
       onDragOver={(e) => {
         onDragOver?.(e);
       }}
-      onDrop={(e) => onDrop?.(e, index)}
+      onDrop={(e) => onDrop?.(e, index!)}
       onClick={handlePreviewClick}
       className={`relative cursor-pointer transition-all duration-200`}
     >
