@@ -27,7 +27,7 @@ const Layout: React.FC = () => {
           <AppSidebar />
           <main className="w-screen">
             <FullscreenButton />
-            <SidebarTrigger />
+            <SidebarTrigger className="md:hidden" />
             <div className="relative">
               <div className="bg-gradient-to-b from-[rgba(0,170,255,0.3)] to-[rgba(255,255,255,0.5)] absolute top-0 w-full h-48 -z-10"></div>
               <EditImageProvider>

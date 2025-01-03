@@ -1,5 +1,12 @@
 import { Link, useLocation } from "react-router-dom";
-import { ArrowLeftRight, Eye, HomeIcon, ImagePlus, Plus } from "lucide-react";
+import {
+  ArrowLeftRight,
+  CircleHelp,
+  Eye,
+  HomeIcon,
+  ImagePlus,
+  Plus,
+} from "lucide-react";
 
 import {
   Sidebar,
@@ -16,12 +23,7 @@ import logo from "../../public/logo.png";
 import { cn } from "@/lib/utils";
 import { useAppContext } from "@/context/app-context";
 import { PreviewCardProps } from "./preview-card";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { useModal } from "@/context/modal-context";
 
 // Menu items.
 type ItemType = {
@@ -64,8 +66,20 @@ export function AppSidebar() {
   const location = useLocation();
   const { isMobile, state } = useSidebar();
   const { firstImage, lastImage } = useAppContext();
+  const { openModal } = useModal();
   items[1].firstImage = firstImage;
   items[1].lastImage = lastImage;
+
+  const handleClick = (title: string, description: string) => {
+    return (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      openModal("infoModal", {
+        title,
+        description,
+      });
+    };
+  };
 
   return (
     <Sidebar side="left" variant="sidebar" collapsible="icon">
@@ -92,28 +106,26 @@ export function AppSidebar() {
 
               {items.map((item, index) => (
                 <SidebarMenuItem key={item.title}>
-                  <TooltipProvider delayDuration={100}>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <SidebarMenuButton
-                          asChild
-                          className={cn(
-                            location.pathname === item.url &&
-                              "bg-sidebar-accent text-sidebar-accent-foreground"
-                          )}
-                          tooltip={item.description}
-                        >
-                          <Link to={item.url}>
-                            <item.icon />
-                            <span>{item.title}</span>
-                          </Link>
-                        </SidebarMenuButton>
-                      </TooltipTrigger>
-                      <TooltipContent side="right" className="z-[999999]">
-                        <p>{item.description}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                  <SidebarMenuButton
+                    asChild
+                    className={cn(
+                      location.pathname === item.url &&
+                        "bg-sidebar-accent text-sidebar-accent-foreground"
+                    )}
+                    tooltip={item.description}
+                  >
+                    <Link to={item.url} className="flex justify-between">
+                      <div className="flex justify-center items-center gap-2">
+                        <item.icon className="text-inherit" />
+                        <span>{item.title}</span>
+                      </div>
+                      <CircleHelp
+                        onClick={handleClick(item.title, item.description)}
+                        className="hover:scale-110"
+                      />
+                    </Link>
+                  </SidebarMenuButton>
+
                   {index === 1 && (
                     <div
                       className={`pl-12 flex flex-col ${item.firstImage && "my-2"} ${
@@ -121,38 +133,20 @@ export function AppSidebar() {
                       }`}
                     >
                       {firstImage && (
-                        <TooltipProvider delayDuration={100}>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Link
-                                className="bg-primary-500 text-white rounded-sm p-2"
-                                to={`/${firstImage.type}`}
-                              >
-                                {firstImage.name}
-                              </Link>
-                            </TooltipTrigger>
-                            <TooltipContent side="right" className="z-[999999]">
-                              <p>Edit and convert first image to video.</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
+                        <Link
+                          className="bg-primary-500 text-white rounded-sm p-2"
+                          to={`/${firstImage.type}`}
+                        >
+                          {firstImage.name}
+                        </Link>
                       )}
                       {lastImage && (
-                        <TooltipProvider delayDuration={100}>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Link
-                                className="bg-primary-500 text-white rounded-sm p-2 mt-2"
-                                to={`/${lastImage.type}`}
-                              >
-                                {lastImage.name}
-                              </Link>
-                            </TooltipTrigger>
-                            <TooltipContent side="right" className="z-[999999]">
-                              <p>Edit and convert last image to video.</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
+                        <Link
+                          className="bg-primary-500 text-white rounded-sm p-2 mt-2"
+                          to={`/${lastImage.type}`}
+                        >
+                          {lastImage.name}
+                        </Link>
                       )}
                     </div>
                   )}
