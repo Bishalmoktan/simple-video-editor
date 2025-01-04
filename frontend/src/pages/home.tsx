@@ -70,6 +70,8 @@ const Home = () => {
     setVideos(newVideos);
   };
 
+  console.log(videos);
+
   return (
     <section className="px-8 py-4 space-y-8">
       {/* add video section  */}

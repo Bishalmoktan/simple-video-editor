@@ -112,6 +112,89 @@ export const createVideoFromImage = async (
   });
 };
 
+export const addTextToVideo = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const {
+      title = "Default Title",
+      subtitle = "Default Subtitle",
+      fontColor = "white",
+      titleFontSizePercentage = 3, // Font size as a percentage of video width
+      subtitleFontSizePercentage = 2, // Font size as a percentage of video width
+      titleXPercent = 50, // Centered horizontally by default
+      titleYPercent = 25, // Vertically at 1/4th of the height by default
+      subtitleXPercent = 50, // Centered horizontally by default
+      subtitleYPercent = 33, // Vertically at 1/3rd of the height by default
+      video,
+      fontFamily = "Arial", // Default font family
+    } = req.body;
+
+    const uploadedVideoPath = await downloadFile(video, "video");
+
+    if (!uploadedVideoPath) {
+      res.status(400).json({ error: "Video is required" });
+      return;
+    }
+
+    // Fixed video dimensions
+    const videoWidth = 1280;
+    const videoHeight = 720;
+
+    // Calculate font sizes based on the video width
+    const titleFontSize = (videoWidth * titleFontSizePercentage) / 100;
+    const subtitleFontSize = (videoWidth * subtitleFontSizePercentage) / 100;
+
+    // Calculate pixel positions based on fixed dimensions
+    const titleX = (videoWidth * titleXPercent) / 100; // Horizontal position for title
+    const titleY = (videoHeight * titleYPercent) / 100; // Vertical position for title
+    const subtitleX = (videoWidth * subtitleXPercent) / 100; // Horizontal position for subtitle
+    const subtitleY = (videoHeight * subtitleYPercent) / 100; // Vertical position for subtitle
+
+    const date = Date.now();
+    const tempDir = path.join(__dirname, "../output");
+    ensureDirectoryExists(tempDir);
+    const outputPath = path.join(tempDir, `video-with-text-${date}.mp4`);
+
+    // Use FFmpeg to overlay text on the video
+    ffmpeg()
+      .input(uploadedVideoPath) // Input video
+      .outputOptions("-c:v libx264") // Video codec
+      .outputOptions("-pix_fmt yuv420p") // Pixel format
+      .outputOptions(
+        "-vf",
+        `
+          drawtext=text='${title}':fontfile=${fontFamily}:fontcolor=${fontColor}:fontsize=${Math.round(titleFontSize)}:x=${titleX}:y=${titleY},
+          drawtext=text='${subtitle}':fontfile=${fontFamily}:fontcolor=${fontColor}:fontsize=${Math.round(subtitleFontSize)}:x=${subtitleX}:y=${subtitleY}
+        `
+      ) // Overlay text on the video
+      .save(outputPath) // Save the output video
+      .on("progress", (progress) => {
+        console.log("Processing:", progress);
+      })
+      .on("end", () => {
+        // Optionally delete the temporary video file after processing
+        fs.unlinkSync(uploadedVideoPath);
+        const videoUrl = `/videos/video-with-text-${date}.mp4`;
+        res.status(200).json({
+          success: true,
+          message: "Video processed successfully",
+          videoUrl,
+        });
+      })
+      .on("error", (err, stdout, stderr) => {
+        console.error("FFmpeg Error:", err);
+        console.error("Stdout:", stdout);
+        console.error("Stderr:", stderr);
+        next(err);
+      });
+  } catch (error) {
+    next(error);
+  }
+};
+
 function getMediaInfo(filePath: string) {
   return new Promise((resolve, reject) => {
     ffmpeg.ffprobe(filePath, (err, metadata) => {

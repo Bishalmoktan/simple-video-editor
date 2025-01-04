@@ -17,6 +17,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { EditImageProvider } from "@/context/edit-image-context";
 import { FullscreenProvider } from "@/context/full-screen-context";
 import FullscreenButton from "@/components/full-screen-button";
+import { EditVideoProvider } from "./context/edit-video-context";
+import EditVideoPage from "./pages/edit-video";
 
 // Shared Layout Component
 const Layout: React.FC = () => {
@@ -30,9 +32,11 @@ const Layout: React.FC = () => {
             <SidebarTrigger className="md:hidden" />
             <div className="relative">
               <div className="bg-gradient-to-b from-[rgba(0,170,255,0.3)] to-[rgba(255,255,255,0.5)] absolute top-0 w-full h-48 -z-10"></div>
-              <EditImageProvider>
-                <Outlet />
-              </EditImageProvider>
+              <EditVideoProvider>
+                <EditImageProvider>
+                  <Outlet />
+                </EditImageProvider>
+              </EditVideoProvider>
               <ModalProvider />
             </div>
             <Toaster />
@@ -55,6 +59,7 @@ const router = createBrowserRouter([
       { path: "/preview-video", element: <PreviewVideo /> },
       { path: "/first-image", element: <FirstImage /> },
       { path: "/last-image", element: <LastImage /> },
+      { path: "/video/:id", element: <EditVideoPage /> },
     ],
   },
 ]);

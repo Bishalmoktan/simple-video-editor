@@ -39,9 +39,10 @@ export default function PreviewCard({
     if (e.defaultPrevented) return;
 
     if (type === "video" && videoUrl) {
-      openModal("previewVideo", {
-        title: name,
-        videoSrc: videoUrl,
+      navigate(`/video/${index}`, {
+        state: {
+          videoUrl,
+        },
       });
     } else {
       navigate(`/${type}`);
