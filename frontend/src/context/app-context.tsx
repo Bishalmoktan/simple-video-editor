@@ -45,7 +45,13 @@ export const AppContextProvider = ({
   const [runMerging, setRunMerging] = useState<boolean>(false);
 
   const videoUrls = useMemo(() => {
-    const urls = videos.map((video) => video.videoUrl);
+    const urls = videos.map((video) => {
+      if (video.newVideoUrl) {
+        return video.newVideoUrl;
+      } else {
+        return video.videoUrl;
+      }
+    });
     if (firstImageVideo) {
       urls.unshift(firstImageVideo);
     }

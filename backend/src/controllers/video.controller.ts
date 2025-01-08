@@ -112,6 +112,186 @@ export const createVideoFromImage = async (
   });
 };
 
+// Function to convert hex color to FFmpeg format
+const hexToFFmpegColor = (hex: string) => {
+  // Remove # if present
+  const color = hex.replace("#", "");
+  // Convert to FFmpeg format (remove alpha if present)
+  return color.length > 6 ? color.substring(0, 6) : color;
+};
+
+const createTextFilter = (
+  text: string,
+  xPercent: number,
+  yPercent: number,
+  color: string,
+  fontSize: number = 48,
+  fontFamily: string = "Arial"
+) => {
+  const videoWidth = 1280;
+  const videoHeight = 720;
+
+  const fontColor = hexToFFmpegColor(color);
+
+  const x = (videoWidth * xPercent) / 100;
+  const y = (videoHeight * yPercent) / 100;
+
+  const scaledFontSize = (videoWidth * fontSize) / 100;
+
+  return `drawtext=text='${text}':
+    fontfile='${fontFamily}':
+    fontsize=${scaledFontSize}:
+    fontcolor=${fontColor}:
+    x=${x}:
+    y=${y}
+    `
+    .replace(/\s+/g, " ")
+    .trim();
+};
+
+export const addTextToVideo = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  upload(req, res, async (err) => {
+    if (err) {
+      next(err);
+      return;
+    }
+
+    try {
+      const {
+        title,
+        subtitle,
+        fontColor = "white",
+        titleFontSizePercentage = 3,
+        subtitleFontSizePercentage = 2,
+        titleXPercent = 50,
+        titleYPercent = 25,
+        subtitleXPercent = 50,
+        subtitleYPercent = 33,
+        video,
+        fontFamily = "Arial",
+        logoXPercent = 90,
+        logoYPercent = 5,
+        logoWidthPercent = 30,
+        logoHeightPercent = 30,
+      } = req.body;
+
+      const logoPath = req.file?.path;
+      const uploadedVideoPath = await downloadFile(video, "video");
+
+      if (!uploadedVideoPath) {
+        res.status(400).json({ error: "Video is required" });
+        return;
+      }
+
+      const date = Date.now();
+      const tempDir = path.join(__dirname, "../output");
+      ensureDirectoryExists(tempDir);
+      const outputPath = path.join(tempDir, `video-with-text-${date}.mp4`);
+
+      let filterComplex: string[] = [];
+      let lastLabel = "scaled";
+
+      // Start with scaling the main input
+      filterComplex.push("[0:v]scale=1280:720[scaled]");
+
+      // Add title if provided
+      if (title) {
+        filterComplex.push(
+          `[${lastLabel}]${createTextFilter(
+            title,
+            titleXPercent,
+            titleYPercent,
+            fontColor,
+            titleFontSizePercentage,
+            fontFamily
+          )}[withTitle]`
+        );
+        lastLabel = "withTitle";
+      }
+
+      // Add subtitle if provided
+      if (subtitle) {
+        filterComplex.push(
+          `[${lastLabel}]${createTextFilter(
+            subtitle,
+            subtitleXPercent,
+            subtitleYPercent,
+            fontColor,
+            subtitleFontSizePercentage,
+            fontFamily
+          )}[withSubtitle]`
+        );
+        lastLabel = "withSubtitle";
+      }
+
+      // Add logo if provided
+      if (logoPath) {
+        const x = (1280 * logoXPercent) / 100;
+        const y = (720 * logoYPercent) / 100;
+        const logoWidth = (1280 * logoWidthPercent) / 100;
+        const logoHeight = (720 * logoHeightPercent) / 100;
+
+        filterComplex.push(`movie=${logoPath}:loop=1[logoInput]`);
+
+        // Scale the logo
+        if (logoWidth > 0 && logoHeight > 0) {
+          filterComplex.push(
+            `[logoInput]scale=w='min(${logoWidth}, iw*(${logoHeight}/ih))':h='min(${logoHeight}, ih*(${logoWidth}/iw))'[scaledLogo]`
+          );
+          filterComplex.push(
+            `[${lastLabel}][scaledLogo]overlay=${x}:${y}[final]`
+          );
+        } else {
+          filterComplex.push(
+            `[${lastLabel}][logoInput]overlay=${x}:${y}[final]`
+          );
+        }
+
+        lastLabel = "final";
+      }
+
+      if (!filterComplex[filterComplex.length - 1].includes("[final]")) {
+        filterComplex[filterComplex.length - 1] = filterComplex[
+          filterComplex.length - 1
+        ].replace(`[${lastLabel}]`, "[final]");
+      }
+
+      // Use FFmpeg to overlay text on the video
+      ffmpeg()
+        .input(uploadedVideoPath)
+        .complexFilter(filterComplex)
+        .outputOptions("-map", "[final]")
+        .outputOptions("-c:v libx264")
+        .outputOptions("-pix_fmt yuv420p")
+        .save(outputPath)
+        .on("progress", (progress) => {
+          console.log("Processing:", progress);
+        })
+        .on("end", () => {
+          fs.unlinkSync(uploadedVideoPath);
+          const videoUrl = `/videos/video-with-text-${date}.mp4`;
+          res.status(200).json({
+            success: true,
+            message: "Video processed successfully",
+            videoUrl,
+          });
+        })
+        .on("error", (err, stdout, stderr) => {
+          console.error("FFmpeg Error:", err);
+          console.error("Stdout:", stdout);
+          console.error("Stderr:", stderr);
+          next(err);
+        });
+    } catch (error) {
+      next(error);
+    }
+  });
+};
+
 function getMediaInfo(filePath: string) {
   return new Promise((resolve, reject) => {
     ffmpeg.ffprobe(filePath, (err, metadata) => {

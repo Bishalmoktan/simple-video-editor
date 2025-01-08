@@ -70,6 +70,7 @@ export default function AddImageVideo({
             setVideos((prev) => [
               ...prev,
               {
+                index: prev.length,
                 name: file.name,
                 type: "video",
                 duration: `${formatMilliseconds(video?.duration)}`,
