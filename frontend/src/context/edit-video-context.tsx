@@ -8,7 +8,7 @@ type EditVideoContextType = {
 export type VideoState = {
   title: string;
   subtitle: string;
-  logo: string | null;
+  logo: string | null | Blob;
   fontFamily: string;
   titleFontSize: string;
   subtitleFontSize: string;

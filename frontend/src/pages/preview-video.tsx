@@ -24,7 +24,13 @@ const PreviewVideo = () => {
 
   useEffect(() => {
     const mergeVideos = async () => {
-      const videoUrls = videos.map((video) => video.videoUrl);
+      const videoUrls = videos.map((video) => {
+        if (video.newVideoUrl) {
+          return video.newVideoUrl;
+        } else {
+          return video.videoUrl;
+        }
+      });
       if (firstImageVideo) {
         videoUrls.unshift(firstImageVideo);
       }

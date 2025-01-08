@@ -7,7 +7,7 @@ const EditVideoPage = () => {
   const { videoUrl } = location.state || {};
 
   if (!id) {
-    return <div>No videoo found.</div>;
+    return <div>No video found.</div>;
   }
 
   return (

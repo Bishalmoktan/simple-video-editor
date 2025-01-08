@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import ImageSelectForm from "./image-select-form";
 import { CloudUpload } from "lucide-react";
-import { axiosClient } from "@/services/api-service";
+import { axiosClientFormData } from "@/services/api-service";
 import { env } from "@/config/env";
 import { useModal } from "@/context/modal-context";
 import { useToast } from "@/hooks/use-toast";
@@ -15,6 +15,7 @@ import {
   useEditVideoContext,
   VideoState,
 } from "@/context/edit-video-context";
+import { useAppContext } from "@/context/app-context";
 
 type Props = {
   index: string;
@@ -40,6 +41,7 @@ export default function EditVideo({ index, videoUrl }: Props) {
   const { toast } = useToast();
   const { openModal } = useModal();
   const { editVideoState, setEditVideoState } = useEditVideoContext();
+  const { setVideos } = useAppContext();
 
   const elementStyles: React.CSSProperties = {
     transition: "font-size 0.3s ease",
@@ -67,7 +69,7 @@ export default function EditVideo({ index, videoUrl }: Props) {
         textColor: "#000000",
         titlePosition: { x: 10, y: 20, width: 300, height: 50 },
         subtitlePosition: { x: 10, y: 80, width: 300, height: 30 },
-        logoPosition: { x: 5, y: 5, width: 50, height: 50 },
+        logoPosition: { x: 550, y: 220, width: 50, height: 50 },
       };
 
       setEditVideoState((prev) => {
@@ -82,7 +84,6 @@ export default function EditVideo({ index, videoUrl }: Props) {
     setEnablePreview(false);
     const file = e.target.files?.[0];
     if (file) {
-      const fileURL = URL.createObjectURL(file);
       const idx = parseInt(index, 10);
       if (isNaN(idx)) {
         console.error("Invalid index provided:", index);
@@ -94,19 +95,19 @@ export default function EditVideo({ index, videoUrl }: Props) {
         const currentVideoState = newState[idx] || {
           title: "",
           subtitle: "",
-          logo: null,
+          logo: file,
           fontFamily: "Arial",
           titleFontSize: "24px",
           subtitleFontSize: "18px",
           textColor: "#000000",
           titlePosition: { x: 10, y: 20, width: 300, height: 50 },
           subtitlePosition: { x: 10, y: 80, width: 300, height: 30 },
-          logoPosition: { x: 5, y: 5, width: 50, height: 50 },
+          logoPosition: { x: 90, y: 90, width: 50, height: 50 },
         };
 
         newState[idx] = {
           ...currentVideoState,
-          logo: fileURL,
+          logo: file,
         };
 
         return newState;
@@ -133,12 +134,6 @@ export default function EditVideo({ index, videoUrl }: Props) {
       return;
     }
 
-    // Reset borders only if refs exist
-    if (titleRef.current && subtitleRef.current) {
-      titleRef.current.style.border = "none";
-      subtitleRef.current.style.border = "none";
-    }
-
     setLoading(true);
 
     // Find the container and handle missing container scenario
@@ -148,7 +143,7 @@ export default function EditVideo({ index, videoUrl }: Props) {
         description: "Video container not found.",
         variant: "destructive",
       });
-      setLoading(false); // Don't forget to stop loading
+      setLoading(false);
       return;
     }
 
@@ -166,6 +161,8 @@ export default function EditVideo({ index, videoUrl }: Props) {
         titleFontSize,
         titlePosition,
         fontFamily,
+        logo,
+        logoPosition,
       } = currentVideoState; // Use currentVideoState directly
 
       // Calculate percentage positions
@@ -183,8 +180,8 @@ export default function EditVideo({ index, videoUrl }: Props) {
       // Ensure all necessary values are valid before appending
       formData.append("video", videoUrl);
       formData.append("fontFamily", fontFamily);
-      formData.append("title", title || "Default Title");
-      formData.append("subtitle", subtitle || "Default Subtitle");
+      formData.append("title", title);
+      formData.append("subtitle", subtitle);
       formData.append("fontColor", textColor || "white");
       formData.append("titleFontSize", titleFontSize);
       formData.append("subtitleFontSize", subtitleFontSize);
@@ -200,12 +197,35 @@ export default function EditVideo({ index, videoUrl }: Props) {
       formData.append("videoWidth", containerWidth.toString());
       formData.append("videoHeight", containerHeight.toString());
 
+      if (logo) {
+        const logoXPercent = (logoPosition.x / containerWidth) * 100;
+        const logoYPercent = (logoPosition.y / containerHeight) * 100;
+        const logoWidthPercent = (logoPosition.width / containerHeight) * 100;
+        const logoHeightPercent = (logoPosition.height / containerHeight) * 100;
+
+        formData.append("image", logo);
+        formData.append("logoXPercent", logoXPercent.toString());
+        formData.append("logoYPercent", logoYPercent.toString());
+        formData.append("logoWidthPercent", logoWidthPercent.toString());
+        formData.append("logoHeightPercent", logoHeightPercent.toString());
+      }
+
       // Make the API call
-      const res = await axiosClient.post(
+      const res = await axiosClientFormData.post(
         "/api/videos/create-video-text",
         formData
       );
       setNewVideoUrl(res.data.videoUrl);
+      setVideos((prev) =>
+        prev.map((video) =>
+          video.index === Number(index)
+            ? {
+                ...video,
+                newVideoUrl: `${env.API_BASE_URL}${res.data.videoUrl}`,
+              }
+            : video
+        )
+      );
 
       setEnablePreview(true);
       toast({
@@ -433,6 +453,14 @@ export default function EditVideo({ index, videoUrl }: Props) {
                     x: editVideoState[parseInt(index, 10)]?.logoPosition.x || 0,
                     y: editVideoState[parseInt(index, 10)]?.logoPosition.y || 0,
                   }}
+                  size={{
+                    width:
+                      editVideoState[parseInt(index, 10)]?.logoPosition.width ||
+                      100,
+                    height:
+                      editVideoState[parseInt(index, 10)]?.logoPosition
+                        .height || 100,
+                  }}
                   onDragStop={(_e, d) => {
                     setEnablePreview(false);
                     setPosition("logoPosition", { x: d.x, y: d.y });
@@ -448,13 +476,15 @@ export default function EditVideo({ index, videoUrl }: Props) {
                   }}
                   minWidth={30}
                   minHeight={30}
-                  maxWidth={100}
-                  maxHeight={100}
+                  maxWidth={500}
+                  maxHeight={500}
                   bounds="parent"
                   className="z-10"
                 >
                   <img
-                    src={editVideoState[parseInt(index, 10)]?.logo || ""}
+                    src={URL.createObjectURL(
+                      editVideoState[parseInt(index, 10)]?.logo as Blob
+                    )}
                     alt="Logo"
                     style={{
                       width: "100%",

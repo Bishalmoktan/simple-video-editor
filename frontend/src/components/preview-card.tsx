@@ -15,6 +15,7 @@ export type PreviewCardProps = {
   duration?: string;
   imageUrl?: string;
   videoUrl?: string;
+  newVideoUrl?: string;
 };
 
 export default function PreviewCard({
@@ -30,6 +31,7 @@ export default function PreviewCard({
   onDragEnd,
   onDragOver,
   onDrop,
+  newVideoUrl,
 }: PreviewCardProps) {
   const { openModal } = useModal();
   const navigate = useNavigate();
@@ -77,7 +79,7 @@ export default function PreviewCard({
         {type === "video" ? (
           videoUrl ? (
             <video
-              src={videoUrl}
+              src={newVideoUrl || videoUrl}
               className="rounded-xl w-[250px] h-[150px] object-cover"
             />
           ) : (
