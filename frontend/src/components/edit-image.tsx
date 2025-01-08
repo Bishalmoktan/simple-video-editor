@@ -281,12 +281,16 @@ export default function EditImage({ type, imageUrl }: Props) {
                     x: imageState.logoPosition.x,
                     y: imageState.logoPosition.y,
                   }}
+                  size={{
+                    width: imageState.logoPosition.width || 100,
+                    height: imageState.logoPosition.height || 100,
+                  }}
                   onDragStop={(_e, d) => {
                     setEnablePreview(false);
                     setImageState((prev) => ({
                       ...prev,
                       logoPosition: {
-                        ...prev.titlePosition,
+                        ...prev.logoPosition,
                         x: d.x,
                         y: d.y,
                       },
@@ -297,7 +301,7 @@ export default function EditImage({ type, imageUrl }: Props) {
                     setImageState((prev) => ({
                       ...prev,
                       logoPosition: {
-                        ...prev.titlePosition,
+                        ...prev.logoPosition,
                         width: parseInt(ref.style.width),
                         height: parseInt(ref.style.height),
                         x: position.x,
@@ -307,8 +311,8 @@ export default function EditImage({ type, imageUrl }: Props) {
                   }}
                   minWidth={30}
                   minHeight={30}
-                  maxWidth={100}
-                  maxHeight={100}
+                  maxWidth={400}
+                  maxHeight={400}
                   bounds="parent"
                   className="z-10"
                 >

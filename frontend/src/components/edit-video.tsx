@@ -175,8 +175,10 @@ export default function EditVideo({ index, videoUrl }: Props) {
       const subtitleYPercent = (subtitlePosition.y / containerHeight) * 100;
 
       // Calculate font size percentage based on container width (or height, if preferred)
-      const titleFontSizePercent = (titleFontSize / containerWidth) * 100;
-      const subtitleFontSizePercent = (subtitleFontSize / containerWidth) * 100;
+      const titleFontSizePercent =
+        (Number(titleFontSize) / containerWidth) * 100;
+      const subtitleFontSizePercent =
+        (Number(subtitleFontSize) / containerWidth) * 100;
 
       // Ensure all necessary values are valid before appending
       formData.append("video", videoUrl);
@@ -184,16 +186,19 @@ export default function EditVideo({ index, videoUrl }: Props) {
       formData.append("title", title || "Default Title");
       formData.append("subtitle", subtitle || "Default Subtitle");
       formData.append("fontColor", textColor || "white");
-      formData.append("titleFontSize", titleFontSize || 24);
-      formData.append("subtitleFontSize", subtitleFontSize || 18);
-      formData.append("titleFontSizePercent", titleFontSizePercent);
-      formData.append("subtitleFontSizePercent", subtitleFontSizePercent);
-      formData.append("titleXPercent", titleXPercent);
-      formData.append("titleYPercent", titleYPercent);
-      formData.append("subtitleXPercent", subtitleXPercent);
-      formData.append("subtitleYPercent", subtitleYPercent);
-      formData.append("videoWidth", containerWidth);
-      formData.append("videoHeight", containerHeight);
+      formData.append("titleFontSize", titleFontSize);
+      formData.append("subtitleFontSize", subtitleFontSize);
+      formData.append("titleFontSizePercent", titleFontSizePercent.toString());
+      formData.append(
+        "subtitleFontSizePercent",
+        subtitleFontSizePercent.toString()
+      );
+      formData.append("titleXPercent", titleXPercent.toString());
+      formData.append("titleYPercent", titleYPercent.toString());
+      formData.append("subtitleXPercent", subtitleXPercent.toString());
+      formData.append("subtitleYPercent", subtitleYPercent.toString());
+      formData.append("videoWidth", containerWidth.toString());
+      formData.append("videoHeight", containerHeight.toString());
 
       // Make the API call
       const res = await axiosClient.post(
@@ -276,7 +281,7 @@ export default function EditVideo({ index, videoUrl }: Props) {
     newPosition: Partial<Position>
   ) => {
     const idx = parseInt(index, 10);
-    if (isNaN(idx)) {
+    if (isNaN(idx) || idx < 0 || idx >= editVideoState.length) {
       console.error("Invalid index provided:", index);
       return;
     }
@@ -284,15 +289,39 @@ export default function EditVideo({ index, videoUrl }: Props) {
     setEditVideoState((prev) => {
       const newState = [...prev];
       const currentVideoState = newState[idx];
+
       if (currentVideoState) {
-        newState[idx] = {
-          ...currentVideoState,
-          [positionKey]: {
-            ...currentVideoState[positionKey],
-            ...newPosition,
-          },
-        };
+        const existingPosition = currentVideoState[positionKey];
+
+        // Validate that the existing position is an object
+        if (
+          existingPosition &&
+          typeof existingPosition === "object" &&
+          !Array.isArray(existingPosition)
+        ) {
+          newState[idx] = {
+            ...currentVideoState,
+            [positionKey]: {
+              ...existingPosition,
+              ...newPosition,
+            },
+          };
+        } else {
+          console.warn(
+            `Expected an object at positionKey "${String(positionKey)}", but got:`,
+            existingPosition
+          );
+
+          // Optionally initialize the position key if it doesn't exist
+          newState[idx] = {
+            ...currentVideoState,
+            [positionKey]: newPosition, // Initialize with `newPosition`
+          };
+        }
+      } else {
+        console.error("No video state found at index:", idx);
       }
+
       return newState;
     });
   };
