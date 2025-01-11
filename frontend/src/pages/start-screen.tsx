@@ -40,7 +40,7 @@ const StartScreen = () => {
         <h2 className="h2">Add first screen of your video.</h2>
         <div className="flex flex-wrap justify-center my-2 md:justify-start gap-y-8 gap-x-2">
           {firstImage && <PreviewCard {...firstImage} />}
-          {!firstImage && <div>No images added.</div>}
+          {!firstImage && <div>No medias added.</div>}
         </div>
       </div>
 
