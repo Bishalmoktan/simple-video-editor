@@ -37,7 +37,7 @@ const LastScreen = () => {
 
       {/* added temporary images section  */}
       <div>
-        <h2 className="h2">Add first screen of your video.</h2>
+        <h2 className="h2">Add last screen of your video.</h2>
         <div className="flex flex-wrap justify-center my-2 md:justify-start gap-y-8 gap-x-2">
           {lastImage && <PreviewCard {...lastImage} />}
           {!lastImage && <div>No images added.</div>}
