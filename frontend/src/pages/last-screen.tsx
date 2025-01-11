@@ -29,9 +29,9 @@ const LastScreen = () => {
       <div className="flex flex-wrap justify-center my-2 md:justify-start gap-y-16 gap-x-2">
         <AddImageVideo
           icon={AddImageIcon}
-          title="Add First Image"
+          title="Add Last Image"
           className="bg-gradient-to-r from-[#00C6DD] via-[#13D8EC] to-[#BEF3FF]"
-          type="first-image"
+          type="last-image"
         />
       </div>
 
