@@ -1,10 +1,7 @@
-import { useState } from "react";
-import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { useModal } from "@/context/modal-context";
 
-export type TemplateSectionProps = {
+export type Templates = {
   id?: string;
   title: string;
   images?: {
@@ -17,36 +14,31 @@ export type TemplateSectionProps = {
   }[];
 };
 
+type TemplateSectionProps = {
+  templates: Templates;
+  query: string;
+  screenType: "firstScreen" | "lastScreen"
+}
+
 export default function TemplateSection({
-  title,
-  images = [],
-  videos = [],
+  templates,
+  query = "",
+  screenType
 }: TemplateSectionProps) {
   const { openModal } = useModal();
-  const [searchQuery, setSearchQuery] = useState("");
-
-  const filteredImages = images.filter((image) =>
-    image.name.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredImages = templates  && templates.images?.filter((image) =>
+    image.name.toLowerCase().includes(query.toLowerCase())
   );
 
-  const filteredVideos = videos.filter((video) =>
-    video.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredVideos =
+    templates &&
+    templates.videos?.filter((video) =>
+      video.name.toLowerCase().includes(query.toLowerCase())
+    );
 
   return (
     <div className="w-full">
-      <div className="flex flex-col md:flex-row justify-between gap-2">
-        <h2 className="h2">{title}</h2>
-        <div className="relative group">
-          <Input
-            className="w-full md:w-[300px] rounded-full bg-gray-100 focus:outline-none"
-            placeholder="Search anything..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          <Search className="absolute top-1/2 -translate-y-1/2 right-4 text-slate-400 group-focus-within:text-slate-950" />
-        </div>
-      </div>
+    
 
       <div className="relative">
         <Separator className="mt-2 mb-6 h-[2px] rounded-md" />
@@ -54,11 +46,11 @@ export default function TemplateSection({
       </div>
 
       <div className="responsive-flex">
-        {filteredImages.map((image, index) => (
+        {filteredImages?.map((image, index) => (
           <div
             key={index}
             onClick={() =>
-              openModal("imageImport", {
+              openModal(screenType, {
                 title: "Import Image",
                 imageSrc: image.imageUrl,
               })
@@ -72,11 +64,11 @@ export default function TemplateSection({
           </div>
         ))}
 
-        {filteredVideos.map((video, index) => (
+        {filteredVideos?.map((video, index) => (
           <div
             key={index}
             onClick={() =>
-              openModal("videoImport", {
+              openModal(screenType, {
                 title: video.name,
                 videoSrc: video.videoUrl,
               })
@@ -89,8 +81,8 @@ export default function TemplateSection({
           </div>
         ))}
 
-        {filteredImages.length === 0 && filteredVideos.length === 0 && (
-          <div>No results found for "{searchQuery}".</div>
+        {filteredImages?.length === 0 && filteredVideos?.length === 0 && (
+          <div>No results found for "{query}".</div>
         )}
       </div>
     </div>

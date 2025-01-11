@@ -1,10 +1,11 @@
 import DeleteModal from "../modals/delete-modal";
+import FirstScreenImport from "../modals/first-screen-import-modal";
 import ImageImportModal from "../modals/image-import-modal";
 import InfoModal from "../modals/info-modal";
+import LastScreenImport from "../modals/last-screen-import-modal";
 import LoadingModal from "../modals/loading-modal";
 import PreviewVideoModal from "../modals/preview-video-modal";
 import UploadProgressModal from "../modals/upload-progress-modal";
-import VideoImportModal from "../modals/video-import-modal";
 
 const ModalProvider = () => {
   return (
@@ -12,10 +13,11 @@ const ModalProvider = () => {
       <PreviewVideoModal />
       <UploadProgressModal />
       <LoadingModal />
-      <VideoImportModal />
       <ImageImportModal />
       <InfoModal />
       <DeleteModal />
+      <FirstScreenImport />
+      <LastScreenImport />
     </>
   );
 };

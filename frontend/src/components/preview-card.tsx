@@ -3,7 +3,7 @@ import { Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export type PreviewCardProps = {
-  type: "first-image" | "last-image" | "video";
+  type: "first-image" | "last-image" | "video" | "first-video" | "last-video";
   name: string;
   index?: number;
   draggable?: boolean;
@@ -46,6 +46,12 @@ export default function PreviewCard({
           videoUrl,
         },
       });
+    } else if (type === "first-video" || type === "last-video") {
+      navigate(`/${type}`, {
+        state: {
+          videoUrl,
+        },
+      });
     } else {
       navigate(`/${type}`);
     }
@@ -75,8 +81,8 @@ export default function PreviewCard({
       onClick={handlePreviewClick}
       className={`relative cursor-pointer transition-all duration-200`}
     >
-      <div className="p-4 bg-primary-100 rounded-lg relative mb-2">
-        {type === "video" ? (
+      <div className="relative p-4 mb-2 rounded-lg bg-primary-100">
+        {type === "video" || type === "first-video" || type === "last-video" ? (
           videoUrl ? (
             <video
               src={newVideoUrl || videoUrl}
@@ -93,7 +99,7 @@ export default function PreviewCard({
           />
         )}
         {duration && (
-          <div className="bg-gray-900 text-white absolute bg-opacity-60 p-1 text-xs left-6 bottom-4 rounded-md">
+          <div className="absolute p-1 text-xs text-white bg-gray-900 rounded-md bg-opacity-60 left-6 bottom-4">
             {duration}
           </div>
         )}
@@ -102,7 +108,7 @@ export default function PreviewCard({
             className="absolute bottom-4 right-5"
             onClick={handleDeleteClick}
           >
-            <div className="bg-red-500 p-2 rounded-full w-fit h-fit hover:scale-105 hover:bg-red-600">
+            <div className="p-2 bg-red-500 rounded-full w-fit h-fit hover:scale-105 hover:bg-red-600">
               <Trash2 className="text-white size-4" />
             </div>
           </div>

@@ -10,7 +10,7 @@ type EditImageContextType = {
 type ImageState = {
   title: string;
   subtitle: string;
-  logo: string | null;
+  logo: string | Blob | null;
   duration: string;
   fontFamily: string;
   titleFontSize: string;

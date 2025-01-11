@@ -1,33 +1,37 @@
-import { useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { Rnd } from "react-rnd";
-import html2canvas from "html2canvas";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import ImageSelectForm from "./image-select-form";
 import { CloudUpload } from "lucide-react";
 import { axiosClientFormData } from "@/services/api-service";
 import { env } from "@/config/env";
 import { useModal } from "@/context/modal-context";
 import { useToast } from "@/hooks/use-toast";
 import { AxiosError } from "axios";
+import { VideoState } from "@/context/edit-video-context";
 import { useAppContext } from "@/context/app-context";
+import ImageSelectForm from "@/components/image-select-form";
 import { useEditImageContext } from "@/context/edit-image-context";
+import { useLocation } from "react-router-dom";
 
 type Props = {
-  type: "lastImage" | "firstImage";
-  imageUrl: string;
+  type: "first" | "last";
 };
 
-export default function EditImage({ type, imageUrl }: Props) {
-  const [videoUrl, setVideoUrl] = useState("");
+export default function FirstLastScreen({ type }: Props) {
+  const [newVideoUrl, setNewVideoUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [enablePreview, setEnablePreview] = useState(false);
 
   const titleRef = useRef<HTMLDivElement | null>(null);
   const subtitleRef = useRef<HTMLDivElement | null>(null);
+  const location = useLocation();
+  const { videoUrl } = location.state || {};
+  console.log(videoUrl)
 
   const { setFirstImageVideo, setLastImageVideo } = useAppContext();
+
   const {
     firstImageState,
     setFirstImageState,
@@ -35,9 +39,9 @@ export default function EditImage({ type, imageUrl }: Props) {
     setLastImageState,
   } = useEditImageContext();
 
-  const imageState = type === "firstImage" ? firstImageState : lastImageState;
-  const setImageState =
-    type === "firstImage" ? setFirstImageState : setLastImageState;
+  const screenState = type === "first" ? firstImageState : lastImageState;
+  const setScreenState =
+    type === "first" ? setFirstImageState : setLastImageState;
 
   const fontFamilyOptions = [
     { text: "Arial", value: "Arial" },
@@ -49,10 +53,8 @@ export default function EditImage({ type, imageUrl }: Props) {
 
   const { toast } = useToast();
   const { openModal } = useModal();
-  const image = type === "firstImage" ? " First " : " Last ";
 
-  // Common styles for elements
-  const elementStyles = {
+  const elementStyles: React.CSSProperties = {
     transition: "font-size 0.3s ease",
     display: "flex",
     justifyContent: "start",
@@ -65,73 +67,131 @@ export default function EditImage({ type, imageUrl }: Props) {
     const file = e.target.files?.[0];
     if (file) {
       const fileURL = URL.createObjectURL(file);
-      setImageState((prevState) => ({ ...prevState, logo: fileURL }));
+      setScreenState((prevState) => ({ ...prevState, logo: fileURL }));
     }
   };
 
   const handleSave = async () => {
-    if (imageState.duration === "0") {
+    if (!screenState) {
       toast({
-        description: "Give duration at least 1 sec",
+        description: "Video state not initialized.",
         variant: "destructive",
       });
       return;
     }
-    if (titleRef.current && subtitleRef.current) {
-      titleRef.current.style.border = "none";
-      subtitleRef.current.style.border = "none";
-    }
+
     setLoading(true);
 
+    // Find the container and handle missing container scenario
+    const container = document.getElementById(`capture-area-${type}`);
+    if (!container) {
+      toast({
+        description: "Video container not found.",
+        variant: "destructive",
+      });
+      setLoading(false);
+      return;
+    }
+
+    const containerWidth = container.clientWidth;
+    const containerHeight = container.clientHeight;
+
     try {
-      // Capture the screenshot from the element
-      const canvas = await html2canvas(
-        document.getElementById("capture-area")!,
-        {
-          useCORS: true,
-        }
+      const formData = new FormData();
+      const {
+        title,
+        textColor,
+        subtitle,
+        subtitlePosition,
+        subtitleFontSize,
+        titleFontSize,
+        titlePosition,
+        fontFamily,
+        logo,
+        logoPosition,
+      } = screenState; // Use currentVideoState directly
+
+      // Calculate percentage positions
+      const titleXPercent = (titlePosition.x / containerWidth) * 100;
+      const titleYPercent = (titlePosition.y / containerHeight) * 100;
+      const subtitleXPercent = (subtitlePosition.x / containerWidth) * 100;
+      const subtitleYPercent = (subtitlePosition.y / containerHeight) * 100;
+
+      // Calculate font size percentage based on container width (or height, if preferred)
+      const titleFontSizePercent =
+        (Number(titleFontSize) / containerWidth) * 100;
+      const subtitleFontSizePercent =
+        (Number(subtitleFontSize) / containerWidth) * 100;
+
+      // Ensure all necessary values are valid before appending
+      formData.append("video", videoUrl);
+      formData.append("fontFamily", fontFamily);
+      formData.append("title", title);
+      formData.append("subtitle", subtitle);
+      formData.append("fontColor", textColor || "white");
+      formData.append("titleFontSize", titleFontSize);
+      formData.append("subtitleFontSize", subtitleFontSize);
+      formData.append("titleFontSizePercent", titleFontSizePercent.toString());
+      formData.append(
+        "subtitleFontSizePercent",
+        subtitleFontSizePercent.toString()
       );
-      // Convert canvas to Blob
-      canvas.toBlob(async (blob) => {
-        if (blob) {
-          // Create FormData to send the image
-          const formData = new FormData();
-          formData.append("image", blob, "image.png");
-          formData.append("duration", imageState.duration);
-          // Send the Blob data via POST request
-          const res = await axiosClientFormData.post(
-            "/api/videos/create-image-video",
-            formData
-          );
-          setVideoUrl(res.data.videoUrl);
-          if (type === "firstImage") {
-            setFirstImageVideo(`${env.API_BASE_URL}${res.data.videoUrl}`);
-          } else {
-            setLastImageVideo(`${env.API_BASE_URL}${res.data.videoUrl}`);
-          }
-          setEnablePreview(true);
-          toast({
-            title: "Video generated!",
-            description: "Click preview to see the video",
-            variant: "success",
-          });
-        }
-      }, "image/png");
+      formData.append("titleXPercent", titleXPercent.toString());
+      formData.append("titleYPercent", titleYPercent.toString());
+      formData.append("subtitleXPercent", subtitleXPercent.toString());
+      formData.append("subtitleYPercent", subtitleYPercent.toString());
+      formData.append("videoWidth", containerWidth.toString());
+      formData.append("videoHeight", containerHeight.toString());
+
+      if (logo) {
+        const logoXPercent = (logoPosition.x / containerWidth) * 100;
+        const logoYPercent = (logoPosition.y / containerHeight) * 100;
+        const logoWidthPercent = (logoPosition.width / containerHeight) * 100;
+        const logoHeightPercent = (logoPosition.height / containerHeight) * 100;
+
+        formData.append("image", logo);
+        formData.append("logoXPercent", logoXPercent.toString());
+        formData.append("logoYPercent", logoYPercent.toString());
+        formData.append("logoWidthPercent", logoWidthPercent.toString());
+        formData.append("logoHeightPercent", logoHeightPercent.toString());
+      }
+
+      // Make the API call
+      const res = await axiosClientFormData.post(
+        "/api/videos/create-video-text",
+        formData
+      );
+      const url = `${env.API_BASE_URL}${res.data.videoUrl}`;
+      setNewVideoUrl(url);
+      if (type === "first") {
+        setFirstImageVideo(url);
+      } else {
+        setLastImageVideo(url);
+      }
+
+      setEnablePreview(true);
+      toast({
+        title: "Video generated!",
+        description: "Click preview to see the video",
+        variant: "success",
+      });
     } catch (error) {
-      console.error("Error saving image:", error);
+      console.error("Error saving video:", error);
       if (error instanceof AxiosError) {
         toast({
-          title: "Error saving the image",
-          description: error.response?.data.error,
+          title: "Error saving the video",
+          description:
+            error.response?.data.error || "Unexpected error occurred.",
           variant: "destructive",
         });
       } else {
         toast({
-          description: "Error saving the image",
+          description: "Error saving the video",
           variant: "destructive",
         });
       }
     } finally {
+      // Reset loading state and borders in finally
       setLoading(false);
       if (titleRef.current && subtitleRef.current) {
         titleRef.current.style.border = "1px solid blue";
@@ -143,12 +203,12 @@ export default function EditImage({ type, imageUrl }: Props) {
   const handlePreview = () => {
     openModal("previewVideo", {
       title: "Preview Video",
-      videoSrc: `${env.API_BASE_URL}${videoUrl}`,
+      videoSrc: `${newVideoUrl || videoUrl}`,
     });
   };
 
-  const setState = (value: string, key: string) => {
-    setImageState((prev) => ({
+  const setState = (value: string, key: keyof VideoState) => {
+    setScreenState((prev) => ({
       ...prev,
       [key]: value,
     }));
@@ -158,27 +218,25 @@ export default function EditImage({ type, imageUrl }: Props) {
     <div className="p-8">
       <div className="grid grid-cols-1 md:grid-cols-2">
         <div>
-          <h2 className="text-center h2">Edit Your {image} Image</h2>
+          <h2 className="text-center h2">Edit Your Video</h2>
           <div className="flex items-center justify-center my-8">
-            <div
-              className="relative overflow-hidden aspect-video"
-              id="capture-area"
-            >
-              <img
-                className="object-cover w-full h-full rounded-md"
-                src={imageUrl}
-                alt="image"
+            <div className="relative ">
+              <video
+                id={`capture-area-${type}`}
+                className="object-cover w-full h-full overflow-hidden rounded-md aspect-video"
+                src={videoUrl}
+                controls
               />
 
               {/* Title Element */}
               <Rnd
                 position={{
-                  x: imageState.titlePosition.x,
-                  y: imageState.titlePosition.y,
+                  x: screenState?.titlePosition.x || 0,
+                  y: screenState?.titlePosition.y || 0,
                 }}
                 onDragStop={(_e, d) => {
                   setEnablePreview(false);
-                  setImageState((prev) => ({
+                  setScreenState((prev) => ({
                     ...prev,
                     titlePosition: {
                       ...prev.titlePosition,
@@ -189,7 +247,7 @@ export default function EditImage({ type, imageUrl }: Props) {
                 }}
                 onResizeStop={(_e, _direction, ref, _delta, position) => {
                   setEnablePreview(false);
-                  setImageState((prev) => ({
+                  setScreenState((prev) => ({
                     ...prev,
                     titlePosition: {
                       ...prev.titlePosition,
@@ -208,32 +266,32 @@ export default function EditImage({ type, imageUrl }: Props) {
                 <div
                   style={{
                     ...elementStyles,
-                    fontSize: `${imageState.titleFontSize}px`,
+                    fontSize: `${screenState?.titleFontSize}px`,
                     width: "100%",
                     height: "100%",
-                    color: imageState.textColor,
+                    color: screenState?.textColor,
                     border: "1px solid blue",
-                    fontFamily: `${imageState.fontFamily}`,
+                    fontFamily: `${screenState?.fontFamily}`,
                   }}
                   ref={titleRef}
                   className="break-all"
                 >
-                  {imageState.title}
+                  {screenState?.title}
                 </div>
               </Rnd>
 
               {/* Subtitle Element */}
               <Rnd
                 position={{
-                  x: imageState.subtitlePosition.x,
-                  y: imageState.subtitlePosition.y,
+                  x: screenState?.subtitlePosition.x || 0,
+                  y: screenState?.subtitlePosition.y || 0,
                 }}
                 onDragStop={(_e, d) => {
                   setEnablePreview(false);
-                  setImageState((prev) => ({
+                  setScreenState((prev) => ({
                     ...prev,
                     subtitlePosition: {
-                      ...prev.titlePosition,
+                      ...prev.subtitlePosition,
                       x: d.x,
                       y: d.y,
                     },
@@ -241,10 +299,10 @@ export default function EditImage({ type, imageUrl }: Props) {
                 }}
                 onResizeStop={(_e, _direction, ref, _delta, position) => {
                   setEnablePreview(false);
-                  setImageState((prev) => ({
+                  setScreenState((prev) => ({
                     ...prev,
                     subtitlePosition: {
-                      ...prev.titlePosition,
+                      ...prev.subtitlePosition,
                       width: parseInt(ref.style.width),
                       height: parseInt(ref.style.height),
                       x: position.x,
@@ -260,34 +318,34 @@ export default function EditImage({ type, imageUrl }: Props) {
                 <div
                   style={{
                     ...elementStyles,
-                    fontSize: `${imageState.subtitleFontSize}px`,
+                    fontSize: `${screenState?.subtitleFontSize}px`,
                     width: "100%",
                     height: "100%",
-                    color: imageState.textColor,
+                    color: screenState?.textColor,
                     border: "1px solid blue",
-                    fontFamily: `${imageState.fontFamily}`,
+                    fontFamily: `${screenState?.fontFamily}`,
                   }}
                   className="break-all"
                   ref={subtitleRef}
                 >
-                  {imageState.subtitle}
+                  {screenState?.subtitle}
                 </div>
               </Rnd>
 
               {/* Logo Element */}
-              {imageState.logo && (
+              {screenState?.logo && (
                 <Rnd
                   position={{
-                    x: imageState.logoPosition.x,
-                    y: imageState.logoPosition.y,
+                    x: screenState?.logoPosition.x || 0,
+                    y: screenState?.logoPosition.y || 0,
                   }}
                   size={{
-                    width: imageState.logoPosition.width || 100,
-                    height: imageState.logoPosition.height || 100,
+                    width: screenState?.logoPosition.width || 100,
+                    height: screenState?.logoPosition.height || 100,
                   }}
                   onDragStop={(_e, d) => {
                     setEnablePreview(false);
-                    setImageState((prev) => ({
+                    setScreenState((prev) => ({
                       ...prev,
                       logoPosition: {
                         ...prev.logoPosition,
@@ -298,7 +356,7 @@ export default function EditImage({ type, imageUrl }: Props) {
                   }}
                   onResizeStop={(_e, _direction, ref, _delta, position) => {
                     setEnablePreview(false);
-                    setImageState((prev) => ({
+                    setScreenState((prev) => ({
                       ...prev,
                       logoPosition: {
                         ...prev.logoPosition,
@@ -311,13 +369,13 @@ export default function EditImage({ type, imageUrl }: Props) {
                   }}
                   minWidth={30}
                   minHeight={30}
-                  maxWidth={400}
-                  maxHeight={400}
+                  maxWidth={500}
+                  maxHeight={500}
                   bounds="parent"
                   className="z-10"
                 >
                   <img
-                    src={imageState.logo as string}
+                    src={URL.createObjectURL(screenState?.logo as Blob)}
                     alt="Logo"
                     style={{
                       width: "100%",
@@ -358,7 +416,7 @@ export default function EditImage({ type, imageUrl }: Props) {
               type="text"
               id="title"
               placeholder="Type here"
-              value={imageState.title}
+              value={screenState?.title || ""}
               onChange={(e) => {
                 setEnablePreview(false);
                 setState(e.target.value, "title");
@@ -371,14 +429,14 @@ export default function EditImage({ type, imageUrl }: Props) {
               Enter Subtitle
             </Label>
             <Input
-              value={imageState.subtitle}
+              type="text"
+              id="subtitle"
+              placeholder="Type here"
+              value={screenState?.subtitle || ""}
               onChange={(e) => {
                 setEnablePreview(false);
                 setState(e.target.value, "subtitle");
               }}
-              type="text"
-              id="subtitle"
-              placeholder="Type here"
             />
           </div>
 
@@ -404,21 +462,7 @@ export default function EditImage({ type, imageUrl }: Props) {
             </div>
           </div>
 
-          <div className="grid w-full max-w-sm items-center gap-1.5">
-            <Label htmlFor="duration" className="text-sm text-slate-500">
-              Enter duration of {image.toLowerCase()} image (seconds)
-            </Label>
-            <Input
-              value={imageState.duration}
-              onChange={(e) => {
-                setEnablePreview(false);
-                setState(e.target.value, "duration");
-              }}
-              type="text"
-              id="duration"
-              placeholder="Type here"
-            />
-          </div>
+          {/* Removed the duration field as per your requirement */}
 
           <div className="grid grid-cols-2 w-full max-w-sm items-center gap-1.5">
             <div>
@@ -429,7 +473,7 @@ export default function EditImage({ type, imageUrl }: Props) {
               <Input
                 type="text"
                 id="titleFontSize"
-                value={imageState.titleFontSize}
+                value={screenState?.titleFontSize || ""}
                 onChange={(e) => {
                   setEnablePreview(false);
                   setState(e.target.value, "titleFontSize");
@@ -448,7 +492,7 @@ export default function EditImage({ type, imageUrl }: Props) {
               <Input
                 type="text"
                 id="subtitleFontSize"
-                value={imageState.subtitleFontSize}
+                value={screenState?.subtitleFontSize || ""}
                 onChange={(e) => {
                   setEnablePreview(false);
                   setState(e.target.value, "subtitleFontSize");
@@ -466,7 +510,7 @@ export default function EditImage({ type, imageUrl }: Props) {
               <Input
                 type="color"
                 id="color"
-                value={imageState.textColor}
+                value={screenState?.textColor || "#000000"}
                 onChange={(e) => {
                   setEnablePreview(false);
                   setState(e.target.value, "textColor");
@@ -478,7 +522,7 @@ export default function EditImage({ type, imageUrl }: Props) {
               <ImageSelectForm
                 label="Select Font"
                 placeholder="Select Font"
-                value={imageState.fontFamily}
+                value={screenState?.fontFamily || "Arial"}
                 options={fontFamilyOptions}
                 onChange={(value) => {
                   setEnablePreview(false);

@@ -37,16 +37,22 @@ type ItemType = {
 
 const items: ItemType[] = [
   {
-    title: "Start",
+    title: "Clips",
     url: "/",
     icon: HomeIcon,
     description: "Add videos",
   },
   {
-    title: "Add Images",
-    url: "/add-images",
+    title: "Start Screen",
+    url: "/start-screen",
     icon: ImagePlus,
-    description: "Add first and last image",
+    description: "Add image or video for the first screen",
+  },
+  {
+    title: "End Screen",
+    url: "/end-screen",
+    icon: ImagePlus,
+    description: "Add image or video for the end screen",
   },
   {
     title: "Apply Transitions",
@@ -115,7 +121,7 @@ export function AppSidebar() {
                     tooltip={item.description}
                   >
                     <Link to={item.url} className="flex justify-between">
-                      <div className="flex justify-center items-center gap-2">
+                      <div className="flex items-center justify-center gap-2">
                         <item.icon className="text-inherit" />
                         <span>{item.title}</span>
                       </div>
@@ -128,22 +134,34 @@ export function AppSidebar() {
 
                   {index === 1 && (
                     <div
-                      className={`pl-12 flex flex-col ${item.firstImage && "my-2"} ${
+                      className={`pl-12 flex flex-col  ${
                         (state === "collapsed" || isMobile) && "hidden"
                       }`}
                     >
                       {firstImage && (
                         <Link
-                          className="bg-primary-500 text-white rounded-sm p-2"
+                          className="p-2 my-2 text-white rounded-sm bg-primary-500"
                           to={`/${firstImage.type}`}
+                          state={{
+                            videoUrl: firstImage.videoUrl,
+                          }}
                         >
                           {firstImage.name}
                         </Link>
                       )}
+                    </div>
+                  )}
+                  {index === 2 && (
+                    <div
+                      className={`pl-12 flex flex-col ${
+                        (state === "collapsed" || isMobile) && "hidden"
+                      }`}
+                    >
                       {lastImage && (
                         <Link
-                          className="bg-primary-500 text-white rounded-sm p-2 mt-2"
+                          className="p-2 my-2 text-white rounded-sm bg-primary-500"
                           to={`/${lastImage.type}`}
+                          state={{ videoUrl: lastImage.videoUrl }}
                         >
                           {lastImage.name}
                         </Link>

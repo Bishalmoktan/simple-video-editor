@@ -9,13 +9,12 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { useAppContext } from "@/context/app-context";
-import { formatMilliseconds } from "@/lib/utils";
 
-const VideoImportModal = () => {
-  const { setVideos } = useAppContext();
+const LastScreenImport = () => {
+  const { setLastImage } = useAppContext();
   const { isOpen, type, data, closeModal } = useModal();
 
-  const isModalOpen = isOpen && type === "videoImport";
+  const isModalOpen = isOpen && type === "lastScreen";
 
   const handleClose = () => {
     closeModal();
@@ -25,24 +24,23 @@ const VideoImportModal = () => {
     if (data?.videoSrc) {
       const video = document.createElement("video");
       video.src = data.videoSrc;
-
       video.onloadedmetadata = () => {
-        setVideos((prev) => [
-          ...prev,
-          {
-            index: prev.length,
-            name: data.title,
-            type: "video",
-            duration: formatMilliseconds(video.duration!),
-            resolution: `${video.videoWidth}x${video.videoHeight}`,
-            videoUrl: data.videoSrc,
-          },
-        ]);
-        handleClose();
+        setLastImage({
+          name: "End Screen",
+          videoUrl: video.src,
+          type: "last-video",
+        });
       };
 
       video.load();
+    } else {
+      setLastImage({
+        name: "Last Image",
+        imageUrl: data?.imageSrc,
+        type: "last-image",
+      });
     }
+    handleClose();
   };
 
   return (
@@ -52,12 +50,20 @@ const VideoImportModal = () => {
           <DialogTitle>{data?.title}</DialogTitle>
         </DialogHeader>
         <Separator />
-        <div className="flex justify-center flex-col items-center">
-          <video
-            src={data?.videoSrc}
-            controls
-            className="rounded-xl w-full h-[200px] object-cover cursor-pointer"
-          ></video>
+        <div className="flex flex-col items-center justify-center">
+          {data?.videoSrc && (
+            <video
+              src={data?.videoSrc}
+              controls
+              className="rounded-xl w-full h-[200px] object-cover cursor-pointer"
+            ></video>
+          )}
+          {data?.imageSrc && (
+            <img
+              src={data?.imageSrc}
+              className="rounded-xl w-full h-[200px] object-cover cursor-pointer"
+            />
+          )}
         </div>
         <DialogFooter>
           <Button className="btn-primary" onClick={handleImport}>
@@ -68,4 +74,4 @@ const VideoImportModal = () => {
     </Dialog>
   );
 };
-export default VideoImportModal;
+export default LastScreenImport;

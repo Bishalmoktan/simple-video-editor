@@ -1,45 +1,13 @@
 import AddVideoIcon from "@/assets/icons/add-video";
 import AddImageVideo from "@/components/add-image-video";
-import PreviewCard from "@/components/preview-card";
-import TemplateSection, {
-  TemplateSectionProps,
-} from "@/components/template-section";
+import PreviewCard from "@/components/preview-card";;
 import { useAppContext } from "@/context/app-context";
-import { useEffect, useState } from "react";
-import { useToast } from "@/hooks/use-toast";
-import { AxiosError } from "axios";
-import { axiosClient } from "@/services/api-service";
 
 const Home = () => {
-  const [templates, setTemplates] = useState<TemplateSectionProps | null>(null);
 
   const { videos, setVideos } = useAppContext();
-  const { toast } = useToast();
 
-  useEffect(() => {
-    const getSampleVideos = async () => {
-      try {
-        const res = await axiosClient.get("/api/videos/sample-videos");
-        setTemplates({
-          title: "Video Templates",
-          videos: res.data.videos,
-        });
-      } catch (error) {
-        if (error instanceof AxiosError) {
-          toast({
-            description: error.message,
-            variant: "destructive",
-          });
-        } else {
-          toast({
-            description: "Error getting the sample videos",
-            variant: "destructive",
-          });
-        }
-      }
-    };
-    getSampleVideos();
-  }, []);
+
 
   // Drag and drop handlers
   const handleDragStart = (e: React.DragEvent, index: number) => {
@@ -70,7 +38,6 @@ const Home = () => {
     setVideos(newVideos);
   };
 
-  console.log(videos);
 
   return (
     <section className="px-8 py-4 space-y-8">
@@ -103,13 +70,6 @@ const Home = () => {
           {videos.length === 0 && <div>No videos added.</div>}
         </div>
       </div>
-
-      {/* template sections */}
-      {templates && (
-        <div>
-          <TemplateSection {...templates} />
-        </div>
-      )}
     </section>
   );
 };

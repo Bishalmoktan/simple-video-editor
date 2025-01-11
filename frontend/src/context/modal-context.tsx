@@ -4,7 +4,8 @@ type ModalType =
   | "previewVideo"
   | "uploadFile"
   | "loading"
-  | "videoImport"
+  | "firstScreen"
+  | "lastScreen"
   | "imageImport"
   | "infoModal"
   | "deleteModal";

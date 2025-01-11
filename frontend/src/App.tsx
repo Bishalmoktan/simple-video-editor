@@ -3,7 +3,6 @@ import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
 import "./App.css";
 
 import Home from "@/pages/home";
-import AddImages from "@/pages/add-images";
 import ApplyTransitions from "@/pages/apply-transitions";
 import PreviewVideo from "@/pages/preview-video";
 import FirstImage from "@/pages/first-image";
@@ -19,6 +18,9 @@ import { FullscreenProvider } from "@/context/full-screen-context";
 import FullscreenButton from "@/components/full-screen-button";
 import { EditVideoProvider } from "./context/edit-video-context";
 import EditVideoPage from "./pages/edit-video";
+import StartScreen from "./pages/start-screen";
+import FirstLastScreen from "./pages/first-last-screen";
+import LastScreen from "./pages/last-screen";
 
 // Shared Layout Component
 const Layout: React.FC = () => {
@@ -54,7 +56,10 @@ const router = createBrowserRouter([
     element: <Layout />,
     children: [
       { index: true, element: <Home /> },
-      { path: "/add-images", element: <AddImages /> },
+      { path: "/start-screen", element: <StartScreen /> },
+      { path: "/end-screen", element: <LastScreen /> },
+      { path: "/first-video", element: <FirstLastScreen type="first" /> },
+      { path: "/last-video", element: <FirstLastScreen type="last" /> },
       { path: "/apply-transitions", element: <ApplyTransitions /> },
       { path: "/preview-video", element: <PreviewVideo /> },
       { path: "/first-image", element: <FirstImage /> },
