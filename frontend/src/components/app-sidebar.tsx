@@ -40,31 +40,36 @@ const items: ItemType[] = [
     title: "Clips",
     url: "/",
     icon: HomeIcon,
-    description: "Add videos",
+    description:
+      "Upload video clips here. Please note that the entire duration of the completed video cannot exceed 240 seconds (4 minutes). For instance, if using 5 different clips, you might restrict each to about 40 seconds. If adding an intro and exit scene, you will be well within the maximum time limit. That’s plenty of time for a talent buyer to assess your performance.",
   },
   {
-    title: "Start Screen",
+    title: "Start Scene",
     url: "/start-screen",
     icon: ImagePlus,
-    description: "Add image or video for the first screen",
+    description:
+      "You can optionally add a static image here to open the video. For instance, a graphic with your band logo. Or, choose from our image and video templates to create one, and add your logo and text if desired. If uploading your own, create the image at 1280 x 720 pixels to match the video output size.",
   },
   {
-    title: "End Screen",
+    title: "End Scene",
     url: "/end-screen",
     icon: ImagePlus,
-    description: "Add image or video for the end screen",
+    description:
+      "You can optionally add a static image here to close the video. For instance, a graphic with your contact information, website URL, etc. Or, choose from our image and video templates to create one, and add your logo and text if desired. If uploading your own image, create the image at 1280 x 720 pixels to match the video output size.",
   },
   {
     title: "Apply Transitions",
     url: "/apply-transitions",
     icon: ArrowLeftRight,
-    description: "Apply transitions to videos",
+    description:
+      "Choose how your video clips should merge here. By default, clips will fade from one into the next. However, there are other transition options from which you can choose. If no transitions are selected, fade will be used by default.",
   },
   {
     title: "Preview Video",
     url: "/preview-video",
     icon: Eye,
-    description: "Merge video and watch preview",
+    description:
+      "After your clips and scenes are merged, you can preview the compiled result here. If satisfied, select the download button to save the video. You can upload the saved video to your Band Breeze profile through the dashboard.",
   },
 ];
 
@@ -89,11 +94,11 @@ export function AppSidebar() {
 
   return (
     <Sidebar side="left" variant="sidebar" collapsible="icon">
-      <SidebarContent>
+      <SidebarContent className="text-white bg-gray-800">
         <SidebarGroup>
           <SidebarGroupLabel className="my-8">
             <Link to={"/"}>
-              <img src={logo} alt="Logo" />
+              <img src={logo} alt="Logo" className="" />
             </Link>
           </SidebarGroupLabel>
           <SidebarGroupContent>

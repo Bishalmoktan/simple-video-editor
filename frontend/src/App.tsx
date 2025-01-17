@@ -29,7 +29,7 @@ const Layout: React.FC = () => {
       <FullscreenProvider>
         <ModalContextProvider>
           <AppSidebar />
-          <main className="w-screen">
+          <main className="w-screen text-gray-200 bg-gray-800 dark">
             <FullscreenButton />
             <SidebarTrigger className="md:hidden" />
             <div className="relative">

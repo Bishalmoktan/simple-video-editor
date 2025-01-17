@@ -16,37 +16,27 @@ export type Templates = {
 
 type TemplateSectionProps = {
   templates: Templates;
-  query: string;
   screenType: "firstScreen" | "lastScreen"
 }
 
 export default function TemplateSection({
   templates,
-  query = "",
   screenType
 }: TemplateSectionProps) {
   const { openModal } = useModal();
-  const filteredImages = templates  && templates.images?.filter((image) =>
-    image.name.toLowerCase().includes(query.toLowerCase())
-  );
 
-  const filteredVideos =
-    templates &&
-    templates.videos?.filter((video) =>
-      video.name.toLowerCase().includes(query.toLowerCase())
-    );
 
   return (
     <div className="w-full">
     
 
       <div className="relative">
-        <Separator className="mt-2 mb-6 h-[2px] rounded-md" />
-        <Separator className="bg-primary-500 absolute top-0 w-[200px] h-[2px] rounded-md" />
+        <Separator className="mt-2 mb-6 h-[2px] rounded-md dark:bg-slate-100" />
+        <Separator className="dark:bg-primary-500 absolute top-0 w-[200px] h-[2px] rounded-md" />
       </div>
 
       <div className="responsive-flex">
-        {filteredImages?.map((image, index) => (
+        {templates.images?.map((image, index) => (
           <div
             key={index}
             onClick={() =>
@@ -64,7 +54,7 @@ export default function TemplateSection({
           </div>
         ))}
 
-        {filteredVideos?.map((video, index) => (
+        {templates.videos?.map((video, index) => (
           <div
             key={index}
             onClick={() =>
@@ -81,8 +71,8 @@ export default function TemplateSection({
           </div>
         ))}
 
-        {filteredImages?.length === 0 && filteredVideos?.length === 0 && (
-          <div>No results found for "{query}".</div>
+        {templates.images?.length === 0 && templates.videos?.length === 0 && (
+          <div>No template available.</div>
         )}
       </div>
     </div>

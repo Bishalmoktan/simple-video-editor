@@ -350,12 +350,12 @@ export default function EditVideo({ index, videoUrl }: Props) {
     <div className="p-8">
       <div className="grid grid-cols-1 md:grid-cols-2">
         <div>
-          <h2 className="h2 text-center">Edit Your Video</h2>
-          <div className="flex justify-center items-center my-8">
+          <h2 className="text-center h2">Edit Your Video</h2>
+          <div className="flex items-center justify-center my-8">
             <div className="relative ">
               <video
                 id={`capture-area-${index}`}
-                className="rounded-md object-cover w-full h-full aspect-video overflow-hidden"
+                className="object-cover w-full h-full overflow-hidden rounded-md aspect-video"
                 src={videoUrl}
                 controls
               />
@@ -497,7 +497,7 @@ export default function EditVideo({ index, videoUrl }: Props) {
             </div>
           </div>
 
-          <div className="flex gap-2 justify-center">
+          <div className="flex justify-center gap-2">
             <Button
               onClick={handleSave}
               className="btn-primary"
@@ -516,7 +516,7 @@ export default function EditVideo({ index, videoUrl }: Props) {
         </div>
 
         {/* Right side form controls */}
-        <div className="flex flex-col gap-3 items-end mt-8 md:mt-0">
+        <div className="flex flex-col items-end gap-3 mt-8 md:mt-0">
           <div className="grid w-full max-w-sm items-center gap-1.5">
             <Label htmlFor="title" className="text-sm text-slate-500">
               Enter Title
@@ -554,10 +554,10 @@ export default function EditVideo({ index, videoUrl }: Props) {
             <div>
               <Label
                 htmlFor="logo"
-                className="flex items-center justify-center gap-2 px-4 py-2 border border-slate-300 rounded-md cursor-pointer bg-white hover:bg-slate-50 text-slate-700 text-sm"
+                className="flex items-center justify-center gap-2 px-4 py-2 text-sm border rounded-md cursor-pointer bg-gray-950 border-slate-300 hover:bg-gray-900 text-slate-700"
               >
                 <CloudUpload className="text-primary-500" />
-                <span className="text-slate-500 text-sm font-normal">
+                <span className="text-sm font-normal text-slate-500">
                   Upload logo
                 </span>
               </Label>

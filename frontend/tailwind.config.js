@@ -11,16 +11,17 @@ module.exports = {
       },
       colors: {
         primary: {
-          100: "#ccf4f9",
-          200: "#99eaf3",
-          300: "#66dfec",
-          400: "#33d5e6",
-          500: "#00cae0",
-          600: "#00a2b3",
-          700: "#007986",
-          800: "#00515a",
-          900: "#00282d",
+          100: "#cce6e6",
+          200: "#99cccc",
+          300: "#66b3b3",
+          400: "#339999",
+          500: "#008080",
+          600: "#006666",
+          700: "#004d4d",
+          800: "#003333",
+          900: "#001a1a",
         },
+
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",

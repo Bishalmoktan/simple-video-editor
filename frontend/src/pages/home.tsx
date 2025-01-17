@@ -46,14 +46,14 @@ const Home = () => {
         <AddImageVideo
           icon={AddVideoIcon}
           title="Add Video"
-          className="bg-gradient-to-r from-[#00C6DD] via-[#13D8EC] to-[#BEF3FF]"
+          className="bg-gradient-to-r from-[#008080] via-[#66b3b3] to-[#99cccc] text-black"
           type="video"
         />
       </div>
 
       {/* added temporary videos  */}
       <div>
-        <h2 className="h2">Create your first video in minutes</h2>
+        <h2 className="h2">My video clips</h2>
         <div className="responsive-flex">
           {videos.map((video, index) => (
             <PreviewCard

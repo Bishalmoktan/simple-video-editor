@@ -4,14 +4,10 @@ import PreviewCard from "@/components/preview-card";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAppContext } from "@/context/app-context";
-import { useState } from "react";
-import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
 import TemplateSection from "@/components/template-section";
 import useFetchTemplates from "@/hooks/use-fetch-templates";
 
 const StartScreen = () => {
-  const [searchQuery, setSearchQuery] = useState("");
 
   const templateImages = useFetchTemplates(
     "/api/videos/sample-images",
@@ -30,14 +26,14 @@ const StartScreen = () => {
         <AddImageVideo
           icon={AddImageIcon}
           title="Add First Image"
-          className="bg-gradient-to-r from-[#00C6DD] via-[#13D8EC] to-[#BEF3FF]"
+          className="bg-gradient-to-r from-[#008080] via-[#66b3b3] to-[#99cccc] text-black"
           type="first-image"
         />
       </div>
 
       {/* added temporary images section  */}
       <div>
-        <h2 className="h2">Add first screen of your video.</h2>
+        <h2 className="h2">Add first scene of your video</h2>
         <div className="flex flex-wrap justify-center my-2 md:justify-start gap-y-8 gap-x-2">
           {firstImage && <PreviewCard {...firstImage} />}
           {!firstImage && <div>No medias added.</div>}
@@ -55,28 +51,25 @@ const StartScreen = () => {
                 Video Templates
               </TabsTrigger>
             </div>
-            <div className="relative">
-              <Input
-                className="w-full md:w-[300px] rounded-full bg-gray-100 focus:outline-none"
-                placeholder="Search anything..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              <Search className="absolute -translate-y-1/2 top-1/2 right-4 text-slate-400 group-focus-within:text-slate-950" />
-            </div>
           </div>
         </TabsList>
         <TabsContent value="image">
           {templateImages && (
             <div>
-              <TemplateSection screenType="firstScreen" query={searchQuery} templates={templateImages} />
+              <TemplateSection
+                screenType="firstScreen"
+                templates={templateImages}
+              />
             </div>
           )}
         </TabsContent>
         <TabsContent value="video">
           {templateVideos && (
             <div>
-              <TemplateSection screenType="firstScreen" query={searchQuery} templates={templateVideos} />
+              <TemplateSection
+                screenType="firstScreen"
+                templates={templateVideos}
+              />
             </div>
           )}
         </TabsContent>
