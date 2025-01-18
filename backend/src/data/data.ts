@@ -1,60 +1,185 @@
-export const videosTemplate = [
+export const imagesTemplate = [
   {
-    name: "Drop of samples evaporating",
-    videoUrl:
-      "https://res.cloudinary.com/duosbmpyq/video/upload/v1734548923/Drop_Of_Samples_Evaporating_Disk_uprm5m.mp4",
+    name: "Smoke",
+    imageUrl:
+      "https://res.cloudinary.com/duosbmpyq/image/upload/v1737184988/Smoke_inpow1.jpg",
   },
   {
-    name: "Sample Video",
-    videoUrl:
-      "https://res.cloudinary.com/duosbmpyq/video/upload/v1734548918/Sample_HD_Video_1280x720_s61lrt.mp4",
+    name: "Grunge Brown",
+    imageUrl:
+      "https://res.cloudinary.com/duosbmpyq/image/upload/v1737184987/Grunge_Brown_x2yv3h.jpg",
   },
   {
-    name: "Blood Sample Close up",
-    videoUrl:
-      "https://res.cloudinary.com/duosbmpyq/video/upload/v1734548917/Blood_Sample_Close-up_Video_krjkhk.mp4",
+    name: "Red Lightning",
+    imageUrl:
+      "https://res.cloudinary.com/duosbmpyq/image/upload/v1737184987/Red-Lightning_si9uom.jpg",
   },
   {
-    name: "Catching Big Carp Fish",
-    videoUrl:
-      "https://res.cloudinary.com/duosbmpyq/video/upload/v1734548779/Catching_Big_Carp_Fish_adociw.mp4",
+    name: "Art",
+    imageUrl:
+      "https://res.cloudinary.com/duosbmpyq/image/upload/v1737184987/016_x01hai.jpg",
   },
   {
-    name: "Drops of Liquid Samples",
-    videoUrl:
-      "https://res.cloudinary.com/duosbmpyq/video/upload/v1734548779/Drops_of_Liquid_Samples_ssk2ot.mp4",
+    name: "Blue Lightning",
+    imageUrl:
+      "https://res.cloudinary.com/duosbmpyq/image/upload/v1737184987/Blue-Lightning_kvcwar.jpg",
+  },
+  {
+    name: "Blue Gradient",
+    imageUrl:
+      "https://res.cloudinary.com/duosbmpyq/image/upload/v1737184987/Blue_Gradient_nciqyk.jpg",
+  },
+  {
+    name: "Sample 1",
+    imageUrl:
+      "https://res.cloudinary.com/duosbmpyq/image/upload/v1737184987/017_qqnspq.jpg",
+  },
+  {
+    name: "Sample 2",
+    imageUrl:
+      "https://res.cloudinary.com/duosbmpyq/image/upload/v1737184987/009_oylgev.jpg",
+  },
+  {
+    name: "Sample 3",
+    imageUrl:
+      "https://res.cloudinary.com/duosbmpyq/image/upload/v1737184986/015_hx16ke.jpg",
+  },
+  {
+    name: "Sample 4",
+    imageUrl:
+      "https://res.cloudinary.com/duosbmpyq/image/upload/v1737184986/014_ibpatr.jpg",
+  },
+  {
+    name: "Sample 5",
+    imageUrl:
+      "https://res.cloudinary.com/duosbmpyq/image/upload/v1737184986/013_qwy32a.jpg",
+  },
+  {
+    name: "Sample 6",
+    imageUrl:
+      "https://res.cloudinary.com/duosbmpyq/image/upload/v1737184986/007_ronehq.jpg",
+  },
+  {
+    name: "Sample 7",
+    imageUrl:
+      "https://res.cloudinary.com/duosbmpyq/image/upload/v1737184986/008_txt5sw.jpg",
+  },
+  {
+    name: "Sample 8",
+    imageUrl:
+      "https://res.cloudinary.com/duosbmpyq/image/upload/v1737184986/012_d3sg9v.jpg",
+  },
+  {
+    name: "Sample 9",
+    imageUrl:
+      "https://res.cloudinary.com/duosbmpyq/image/upload/v1737184985/005_roj8tn.jpg",
+  },
+  {
+    name: "Sample 10",
+    imageUrl:
+      "https://res.cloudinary.com/duosbmpyq/image/upload/v1737184985/003_pdkurh.jpg",
+  },
+  {
+    name: "Sample 11",
+    imageUrl:
+      "https://res.cloudinary.com/duosbmpyq/image/upload/v1737184985/004_ql1h9l.jpg",
+  },
+  {
+    name: "Sample 12",
+    imageUrl:
+      "https://res.cloudinary.com/duosbmpyq/image/upload/v1737184985/011_c2xhy6.jpg",
+  },
+  {
+    name: "Sample 13",
+    imageUrl:
+      "https://res.cloudinary.com/duosbmpyq/image/upload/v1737184985/010_nrdbd2.jpg",
+  },
+  {
+    name: "Sample 14",
+    imageUrl:
+      "https://res.cloudinary.com/duosbmpyq/image/upload/v1737184985/002_tjokrb.jpg",
+  },
+  {
+    name: "Sample 14",
+    imageUrl:
+      "https://res.cloudinary.com/duosbmpyq/image/upload/v1737184984/001_vyias1.jpg",
   },
 ];
 
-export const imagesTemplate = [
+export const videosTemplate = [
   {
-    name: "Woman holding blue smoke flare",
-    imageUrl:
-      "https://res.cloudinary.com/duosbmpyq/image/upload/v1734549230/Woman_Holding_Blue_Smoke_Flare_x6yp6z.jpg",
+    name: "Embers",
+    videoUrl:
+      "https://res.cloudinary.com/duosbmpyq/video/upload/v1737185145/Embers_lbqean.mp4",
   },
   {
-    name: "Person in Red Hoodie balomk",
-    imageUrl:
-      "https://res.cloudinary.com/duosbmpyq/image/upload/v1734549230/Person_in_Red_Hoodie_balomk.jpg",
+    name: "Vertical Glitter",
+    videoUrl:
+      "https://res.cloudinary.com/duosbmpyq/video/upload/v1737185142/Vertical_Glitter_zc0nwc.mp4",
   },
   {
-    name: "Fisherman on Boat Aerial View",
-    imageUrl:
-      "https://res.cloudinary.com/duosbmpyq/image/upload/v1734549229/Fisherman_on_Boat_Aerial_View_hfyqga.jpg",
+    name: "Startfield",
+    videoUrl:
+      "https://res.cloudinary.com/duosbmpyq/video/upload/v1737185141/Starfield_zpdomz.mp4",
   },
   {
-    name: "Clear Glass Sphere",
-    imageUrl:
-      "https://res.cloudinary.com/duosbmpyq/image/upload/v1734549229/Clear_Glass_Sphere_rc7ve2.jpg",
+    name: "Vinyl Record",
+    videoUrl:
+      "https://res.cloudinary.com/duosbmpyq/video/upload/v1737185141/Vinyl_Record_pfysuv.mp4",
   },
   {
-    name: "Color Shade Samples",
-    imageUrl:
-      "https://res.cloudinary.com/duosbmpyq/image/upload/v1734549228/Color_Shade_Samples_go35lk.jpg",
+    name: "Purple Mist",
+    videoUrl:
+      "https://res.cloudinary.com/duosbmpyq/video/upload/v1737185141/Purple_Mist_ofbhj3.mp4",
   },
   {
-    name: "Laboratoryy Test Tubes",
-    imageUrl:
-      "https://res.cloudinary.com/duosbmpyq/image/upload/v1734549229/Laboratory_Test_Tubes_pqtf4l.jpg",
+    name: "Space Vortex",
+    videoUrl:
+      "https://res.cloudinary.com/duosbmpyq/video/upload/v1737185139/Space_Vortex_pjvwt6.mp4",
+  },
+  {
+    name: "Fireball",
+    videoUrl:
+      "https://res.cloudinary.com/duosbmpyq/video/upload/v1737185136/Fireball_2_qgbmm0.mp4",
+  },
+  {
+    name: "Smoke",
+    videoUrl:
+      "https://res.cloudinary.com/duosbmpyq/video/upload/v1737185135/Smoke_zblt2r.mp4",
+  },
+  {
+    name: "Fireball 2",
+    videoUrl:
+      "https://res.cloudinary.com/duosbmpyq/video/upload/v1737185133/Fireball_innqu0.mp4",
+  },
+  {
+    name: "Graffiti",
+    videoUrl:
+      "https://res.cloudinary.com/duosbmpyq/video/upload/v1737185133/Graffiti_axjbao.mp4",
+  },
+  {
+    name: "Horizon",
+    videoUrl:
+      "https://res.cloudinary.com/duosbmpyq/video/upload/v1737185133/Horizon_uat3nm.mp4",
+  },
+  {
+    name: "Ethereal Fire",
+    videoUrl:
+      "https://res.cloudinary.com/duosbmpyq/video/upload/v1737185130/Ethereal_Fire_tzl4xw.mp4",
+  },
+  {
+    name: "Club Vibe",
+    videoUrl:
+      "https://res.cloudinary.com/duosbmpyq/video/upload/v1737185128/Club_Vibe_xzl87y.mp4",
+  },
+  {
+    name: "Black Silk",
+    videoUrl:
+      "https://res.cloudinary.com/duosbmpyq/video/upload/v1737185126/Black_Silk_axmi0x.mp4",
+  },
+  {
+    name: "Billow",
+    videoUrl:
+      "https://res.cloudinary.com/duosbmpyq/video/upload/v1737185125/Billow_lzptoe.mp4",
   },
 ];
