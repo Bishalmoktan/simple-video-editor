@@ -11,6 +11,7 @@ import {
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -19,7 +20,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import logo from "../../public/logo.jpeg";
+import logo from "../../public/logo.png";
 import { cn } from "@/lib/utils";
 import { useAppContext } from "@/context/app-context";
 import { PreviewCardProps } from "./preview-card";
@@ -29,10 +30,10 @@ import { useModal } from "@/context/modal-context";
 type ItemType = {
   title: string;
   url: string;
-  icon: React.FC<React.SVGProps<SVGSVGElement>>;
+  icon?: React.FC<React.SVGProps<SVGSVGElement>>;
   firstImage?: PreviewCardProps | null;
   lastImage?: PreviewCardProps | null;
-  description: string;
+  description?: string;
 };
 
 const items: ItemType[] = [
@@ -70,6 +71,21 @@ const items: ItemType[] = [
     icon: Eye,
     description:
       "After your clips and scenes are merged, you can preview the compiled result here. If satisfied, select the download button to save the video. You can upload the saved video to your Band Breeze profile through the dashboard.",
+  },
+];
+
+const navLinks: ItemType[] = [
+  {
+    title: "Tutorial Video",
+    url: "https://www.bandbreeze.com/demo-reel-builder-tutorial",
+  },
+  {
+    title: "Professional Services",
+    url: "https://www.bandbreeze.com/professional-services",
+  },
+  {
+    title: "Band Breeze Home",
+    url: "https://bandbreeze.com/",
   },
 ];
 
@@ -127,11 +143,11 @@ export function AppSidebar() {
                   >
                     <Link to={item.url} className="flex justify-between">
                       <div className="flex items-center justify-center gap-2">
-                        <item.icon className="text-inherit" />
+                        {item.icon && <item.icon className="text-inherit" />}
                         <span>{item.title}</span>
                       </div>
                       <CircleHelp
-                        onClick={handleClick(item.title, item.description)}
+                        onClick={handleClick(item.title, item.description!)}
                         className="hover:scale-110"
                       />
                     </Link>
@@ -179,6 +195,17 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter className="text-gray-300 bg-gray-800 pb-8">
+        <SidebarMenu>
+          {navLinks.map((item, index) => (
+            <SidebarMenuItem key={index} className="mx-auto">
+              <Link to={item.url} target="_blank" className="hover:underline hover:text-white">
+                {item.title}
+              </Link>
+            </SidebarMenuItem>
+          ))}
+        </SidebarMenu>
+      </SidebarFooter>
     </Sidebar>
   );
 }
