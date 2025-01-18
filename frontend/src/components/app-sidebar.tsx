@@ -19,7 +19,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import logo from "../../public/logo.png";
+import logo from "../../public/logo.jpeg";
 import { cn } from "@/lib/utils";
 import { useAppContext } from "@/context/app-context";
 import { PreviewCardProps } from "./preview-card";
