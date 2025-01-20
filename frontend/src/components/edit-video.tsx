@@ -554,7 +554,7 @@ export default function EditVideo({ index, videoUrl }: Props) {
             <div>
               <Label
                 htmlFor="logo"
-                className="flex items-center justify-center gap-2 px-4 py-2 text-sm border rounded-md cursor-pointer bg-gray-950 border-slate-300 hover:bg-gray-900 text-slate-700"
+                className="flex items-center justify-center gap-2 px-4 py-2 text-sm border rounded-md cursor-pointer "
               >
                 <CloudUpload className="text-primary-500" />
                 <span className="text-sm font-normal text-slate-500">
@@ -571,7 +571,6 @@ export default function EditVideo({ index, videoUrl }: Props) {
             </div>
           </div>
 
-          {/* Removed the duration field as per your requirement */}
 
           <div className="grid grid-cols-2 w-full max-w-sm items-center gap-1.5">
             <div>

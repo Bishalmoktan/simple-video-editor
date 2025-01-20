@@ -6,7 +6,7 @@ const FullscreenButton: React.FC = () => {
 
   return (
     <button
-      className="fixed z-50 p-2 bg-gray-800 rounded-full shadow-md top-2 right-2 hover:bg-gray-900"
+      className="fixed z-50 p-2 bg-gray-200 rounded-full shadow-md top-2 right-2 hover:bg-gray-300"
       onClick={toggleFullscreen}
       aria-label="Toggle Fullscreen"
     >

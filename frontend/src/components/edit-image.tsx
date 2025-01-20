@@ -351,7 +351,7 @@ export default function EditImage({ type, imageUrl }: Props) {
         {/* Right side form controls */}
         <div className="flex flex-col items-end gap-3 mt-8 md:mt-0">
           <div className="grid w-full max-w-sm items-center gap-1.5">
-            <Label htmlFor="title" className="text-sm text-slate-200">
+            <Label htmlFor="title" className="text-sm text-slate-500">
               Enter Title
             </Label>
             <Input
@@ -367,7 +367,7 @@ export default function EditImage({ type, imageUrl }: Props) {
           </div>
 
           <div className="grid w-full max-w-sm items-center gap-1.5">
-            <Label htmlFor="subtitle" className="text-sm text-slate-200">
+            <Label htmlFor="subtitle" className="text-sm text-slate-500">
               Enter Subtitle
             </Label>
             <Input
@@ -383,14 +383,14 @@ export default function EditImage({ type, imageUrl }: Props) {
           </div>
 
           <div className="grid w-full max-w-sm items-center gap-1.5">
-            <div className="text-sm text-slate-200">Upload logo</div>
+            <div className="text-sm text-slate-500">Upload logo</div>
             <div>
               <Label
                 htmlFor="logo"
-                className="flex items-center justify-center gap-2 px-4 py-2 text-sm border rounded-md cursor-pointer bg-gray-950 border-slate-300 hover:bg-gray-900 text-slate-700"
+                className="flex items-center justify-center gap-2 px-4 py-2 text-sm border rounded-md cursor-pointer "
               >
                 <CloudUpload className="text-primary-500" />
-                <span className="text-sm font-normal text-slate-200">
+                <span className="text-sm font-normal text-slate-500">
                   Upload logo
                 </span>
               </Label>
@@ -403,9 +403,8 @@ export default function EditImage({ type, imageUrl }: Props) {
               />
             </div>
           </div>
-
           <div className="grid w-full max-w-sm items-center gap-1.5">
-            <Label htmlFor="duration" className="text-sm text-slate-200">
+            <Label htmlFor="duration" className="text-sm text-slate-500">
               Enter duration of {image.toLowerCase()} image (seconds)
             </Label>
             <Input
@@ -422,7 +421,7 @@ export default function EditImage({ type, imageUrl }: Props) {
 
           <div className="grid grid-cols-2 w-full max-w-sm items-center gap-1.5">
             <div>
-              <Label htmlFor="titleFontSize" className="text-sm text-slate-200">
+              <Label htmlFor="titleFontSize" className="text-sm text-slate-500">
                 Title font size
               </Label>
 
@@ -440,7 +439,7 @@ export default function EditImage({ type, imageUrl }: Props) {
             <div>
               <Label
                 htmlFor="subtitleFontSize"
-                className="text-sm text-slate-200"
+                className="text-sm text-slate-500"
               >
                 Subtitle font size
               </Label>
@@ -459,7 +458,7 @@ export default function EditImage({ type, imageUrl }: Props) {
 
           <div className="grid grid-cols-2 w-full max-w-sm items-center gap-1.5">
             <div>
-              <Label htmlFor="color" className="text-sm text-slate-200">
+              <Label htmlFor="color" className="text-sm text-slate-500">
                 Select Color
               </Label>
 
@@ -474,7 +473,7 @@ export default function EditImage({ type, imageUrl }: Props) {
               />
             </div>
             <div>
-              <Label className="text-sm text-slate-200">Select Font</Label>
+              <Label className="text-sm text-slate-500">Select Font</Label>
               <ImageSelectForm
                 label="Select Font"
                 placeholder="Select Font"
