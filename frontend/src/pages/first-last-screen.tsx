@@ -28,7 +28,6 @@ export default function FirstLastScreen({ type }: Props) {
   const subtitleRef = useRef<HTMLDivElement | null>(null);
   const location = useLocation();
   const { videoUrl } = location.state || {};
-  console.log(videoUrl)
 
   const { setFirstImageVideo, setLastImageVideo } = useAppContext();
 
@@ -144,12 +143,13 @@ export default function FirstLastScreen({ type }: Props) {
       formData.append("videoHeight", containerHeight.toString());
 
       if (logo) {
+        const logoBlob = await fetch(logo as string).then((res) => res.blob()); // Fetch the logo as a Blob
         const logoXPercent = (logoPosition.x / containerWidth) * 100;
         const logoYPercent = (logoPosition.y / containerHeight) * 100;
         const logoWidthPercent = (logoPosition.width / containerHeight) * 100;
         const logoHeightPercent = (logoPosition.height / containerHeight) * 100;
 
-        formData.append("image", logo);
+        formData.append("image", logoBlob, "logo.png"); // Append the logo Blob with a file name
         formData.append("logoXPercent", logoXPercent.toString());
         formData.append("logoYPercent", logoYPercent.toString());
         formData.append("logoWidthPercent", logoWidthPercent.toString());
@@ -375,7 +375,7 @@ export default function FirstLastScreen({ type }: Props) {
                   className="z-10"
                 >
                   <img
-                    src={URL.createObjectURL(screenState?.logo as Blob)}
+                    src={screenState.logo as string}
                     alt="Logo"
                     style={{
                       width: "100%",
